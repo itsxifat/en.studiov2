@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { Writable } from 'stream';
 
-// Configure Cloudinary
+// Configure Cloudinary (keep as is)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -10,8 +10,9 @@ cloudinary.config({
   secure: true,
 });
 
-// Helper to convert a file buffer for streaming
+// Helper streamToBuffer (keep as is)
 const streamToBuffer = async (readableStream) => {
+  // ... (keep existing code)
   const chunks = [];
   for await (const chunk of readableStream) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
@@ -19,35 +20,31 @@ const streamToBuffer = async (readableStream) => {
   return Buffer.concat(chunks);
 };
 
-// Main POST handler for uploading
 export async function POST(request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file');
-    const title = formData.get('title');
-    const description = formData.get('description');
+    const title = formData.get('title') || ''; // Default to empty string
+    const description = formData.get('description') || ''; // Default to empty string
 
     if (!file) {
       return NextResponse.json({ success: false, error: "No file provided." }, { status: 400 });
     }
 
-    // Convert file to buffer
     const buffer = await streamToBuffer(file.stream());
 
-    // Upload to Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: 'portfolio', // All uploads go to the "portfolio" folder
-          // We store title/description in the 'context' metadata field
-          context: `title=${title}|description=${description}`,
+          folder: 'portfolio',
+          // ✨ MODIFIED: Add isFeatured=false to context
+          context: `title=${title}|description=${description}|isFeatured=false`,
         },
         (error, result) => {
           if (error) return reject(error);
           resolve(result);
         }
       );
-      // Pipe the buffer to the upload stream
       uploadStream.end(buffer);
     });
 
