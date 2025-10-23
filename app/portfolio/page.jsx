@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ClientPortfolioPage } from './_clientComponents';
 import { PhotographyGallery } from './_photographyGallery'; // New Component
 
-// Your existing PortfolioHeader (Unchanged)
+// Your existing PortfolioHeader (Unchanged except image fix)
 const PortfolioHeader = () => {
   const router = useRouter();
 
@@ -46,6 +46,7 @@ const PortfolioHeader = () => {
             height={80}
             className="h-16 w-auto sm:h-20 drop-shadow-2xl"
             priority
+            unoptimized
           />
         </motion.div>
 

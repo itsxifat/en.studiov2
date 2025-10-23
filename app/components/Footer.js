@@ -8,24 +8,25 @@ const Footer = () => {
     <footer className="bg-black text-neutral-400 py-12 border-t-2 border-neutral-800">
       <div className="container mx-auto px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          {/* Replaced <a> with <Link> */}
+          {/* Logo */}
           <Link
             href="/"
             className="select-none active:opacity-90 relative z-10 block"
             aria-label="Go to home"
           >
-            {/* Replaced <img> with <Image> */}
             <Image
               src="/logo.png"
               alt="En.Studio Logo"
-              width={40} // Provide width (adjust based on h-10 class)
-              height={40} // Provide height
-              className="w-auto h-8 sm:h-10" // Keep height classes for responsiveness if needed
+              width={40}
+              height={40}
+              className="w-auto h-8 sm:h-10"
+              priority
+              unoptimized
             />
           </Link>
+
+          {/* Navigation Links */}
           <div className="flex gap-8 font-body">
-            {/* These internal page links should ideally also be <Link> if they are routes,
-                but keeping as <a> for hash links as per original code */}
             <a href="#work" className="hover:text-white transition-colors">
               Work
             </a>
@@ -40,6 +41,8 @@ const Footer = () => {
             </a>
           </div>
         </div>
+
+        {/* Copyright */}
         <div className="border-t border-neutral-800 mt-8 pt-8 text-center text-sm font-body">
           <p>
             &copy; {new Date().getFullYear()} En.Studio. All Rights Reserved. <br /> Developed by EnTech.

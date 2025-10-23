@@ -169,7 +169,14 @@ const Header = () => {
           className="select-none active:opacity-90 relative z-10 block"
           aria-label="Go to home"
         >
-          <Image src="/logo.png" alt="En.Studio Logo" width={120} height={40} />
+          <Image
+            src="/logo.png"
+            alt="En.Studio Logo"
+            width={120}
+            height={40}
+            priority
+            unoptimized
+          />
         </Link>
 
         {/* Desktop nav */}
