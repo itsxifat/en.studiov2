@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2 as Loader, AlertTriangle, X, Maximize2 } from "lucide-react";
+import { Loader2 as Loader, AlertTriangle, X, Maximize2, Camera } from "lucide-react"; // Added Camera here
 import Image from "next/image"; // Using Next.js Image for optimization
 
 // NEW: Simple Photo Modal

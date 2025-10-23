@@ -1,14 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ... any other config you have ...
+  // ... your other config ...
 
-  // ADD THIS BLOCK:
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...config.externals, 'googleapis'];
-    }
-    return config;
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
   },
+
+  // If you still have the webpack externals config, you can remove it now
+  // webpack: (config, { isServer }) => { ... }, // REMOVE THIS BLOCK if present
 };
 
 export default nextConfig;
