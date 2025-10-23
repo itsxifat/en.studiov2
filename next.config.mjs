@@ -8,6 +8,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
+      { // Add this new entry for placehold.co
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
     ],
   },
 
