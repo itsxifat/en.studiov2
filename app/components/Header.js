@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { gsap } from "gsap";
+import Link from "next/link";
+import Image from "next/image";
 
 const LINKS = [
   { href: "#work", label: "Work" },
@@ -9,7 +11,6 @@ const LINKS = [
   { href: "#contact", label: "Contact" },
 ];
 
-/* COMPONENT */
 const Header = () => {
   const headerRef = useRef(null);
   const glassRef = useRef(null);
@@ -20,7 +21,6 @@ const Header = () => {
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* mount + scroll */
   useEffect(() => {
     setLoaded(true);
     const hdr = headerRef.current;
@@ -40,7 +40,6 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* brand micro-tilt */
   useEffect(() => {
     const el = brandRef.current;
     if (!el) return;
@@ -67,7 +66,6 @@ const Header = () => {
     };
   }, []);
 
-  /* underline follower (1px) */
   useEffect(() => {
     const nav = navRef.current;
     const underline = underlineRef.current;
@@ -106,7 +104,6 @@ const Header = () => {
     };
   }, [loaded]);
 
-  /* mobile menu */
   const backdropRef = useRef(null);
   const sheetRef = useRef(null);
   const listRef = useRef(null);
@@ -155,21 +152,25 @@ const Header = () => {
   }, [menuOpen, closeMenu]);
 
   return (
-    <header ref={headerRef} className="fixed -top-1 left-0 w-full z-[500] text-white" aria-label="Main navigation">
+    <header
+      ref={headerRef}
+      className="fixed -top-1 left-0 w-full z-[500] text-white"
+      aria-label="Main navigation"
+    >
       <div
         ref={glassRef}
         className="mx-auto max-w-7xl px-4 sm:px-6 h-10 md:h-15 flex items-center rounded-2xl relative transition-[height] duration-200"
         style={{ background: "transparent" }}
       >
         {/* Brand */}
-        <a
+        <Link
           ref={brandRef}
           href="/"
           className="select-none active:opacity-90 relative z-10 block"
           aria-label="Go to home"
         >
-          <img src="/logo.png" alt="En.Studio Logo" className="h-8 sm:h-10 w-auto" />
-        </a>
+          <Image src="/logo.png" alt="En.Studio Logo" width={120} height={40} />
+        </Link>
 
         {/* Desktop nav */}
         <nav
@@ -182,7 +183,11 @@ const Header = () => {
             style={{ width: 0, opacity: 0, transform: "translateX(0px)" }}
           />
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="relative py-2 text-white/90 hover:text-white transition-colors">
+            <a
+              key={l.href}
+              href={l.href}
+              className="relative py-2 text-white/90 hover:text-white transition-colors"
+            >
               <span className="relative z-10">{l.label}</span>
             </a>
           ))}
@@ -216,7 +221,7 @@ const Header = () => {
         </button>
       </div>
 
-      {/* MOBILE MENU MODAL */}
+      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 z-[600]" role="dialog" aria-modal="true">
           <div ref={backdropRef} className="absolute inset-0 bg-black/50" onClick={closeMenu} />
@@ -224,8 +229,10 @@ const Header = () => {
             ref={sheetRef}
             className="absolute left-1/2 top-6 w-[92vw] max-w-sm -translate-x-1/2 rounded-2xl border border-white/10 bg-white/6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-5"
             style={{
-              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 rgba(255,255,255,0.05)",
-              background: "linear-gradient(180deg, rgba(12,18,28,0.85), rgba(12,18,28,0.78))",
+              boxShadow:
+                "inset 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 rgba(255,255,255,0.05)",
+              background:
+                "linear-gradient(180deg, rgba(12,18,28,0.85), rgba(12,18,28,0.78))",
             }}
           >
             <div className="flex items-center justify-between mb-2">
@@ -235,8 +242,19 @@ const Header = () => {
                 className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
                 aria-label="Close menu"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" className="text-white/90" fill="none" stroke="currentColor">
-                  <path d="M6 6l12 12M18 6l-12 12" strokeWidth="2" strokeLinecap="round" />
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  className="text-white/90"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    d="M6 6l12 12M18 6l-12 12"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
             </div>
@@ -249,7 +267,9 @@ const Header = () => {
                     onClick={closeMenu}
                     className="group flex items-center justify-between rounded-xl px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                   >
-                    <span className="uppercase tracking-[0.14em] text-[12px] text-white/90">{l.label}</span>
+                    <span className="uppercase tracking-[0.14em] text-[12px] text-white/90">
+                      {l.label}
+                    </span>
                     <svg
                       width="18"
                       height="18"
