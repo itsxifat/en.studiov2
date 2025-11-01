@@ -162,7 +162,6 @@ const Header = () => {
         className="mx-auto max-w-7xl px-4 sm:px-6 h-10 md:h-15 flex items-center rounded-2xl relative transition-[height] duration-200"
         style={{ background: "transparent" }}
       >
-        {/* Brand */}
         <Link
           ref={brandRef}
           href="/"
@@ -179,7 +178,6 @@ const Header = () => {
           />
         </Link>
 
-        {/* Desktop nav */}
         <nav
           ref={navRef}
           className="ml-auto hidden md:flex items-center gap-8 uppercase text-xs tracking-[0.18em] relative z-10"
@@ -200,10 +198,13 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Mobile menu icon */}
+        {/* --- THIS IS THE UPDATED BUTTON --- */}
         <button
           onClick={() => (menuOpen ? closeMenu() : openMenu())}
-          className="ml-auto md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-transform active:scale-95 relative z-10"
+          className="ml-auto md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg 
+                     bg-transparent border-none outline-none 
+                     focus:outline-none focus:ring-0 
+                     transition-transform active:scale-95 relative z-10"
           aria-label="Open menu"
           aria-haspopup="dialog"
           aria-expanded={menuOpen ? "true" : "false"}
@@ -226,9 +227,10 @@ const Header = () => {
             />
           </div>
         </button>
+        {/* --- END OF UPDATED BUTTON --- */}
+
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 z-[600]" role="dialog" aria-modal="true">
           <div ref={backdropRef} className="absolute inset-0 bg-black/50" onClick={closeMenu} />

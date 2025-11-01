@@ -8,7 +8,6 @@ import Header from "./Header";
 import HeroSection from "./HeroSection";
 import PortfolioSection from "./PortfolioSection";
 import ServicesSection from "./ServicesSection";
-import AboutSection from "./AboutSection";
 import TestimonialsSection from "./TestimonialsSection";
 import ContactSection from "./ContactSection";
 import Footer from "./Footer";
@@ -43,7 +42,6 @@ export default function StudioWebsitePage() {
           <HeroSection />
           <PortfolioSection />
           <ServicesSection />
-          <AboutSection />
           <TestimonialsSection />
           <ContactSection />
           <Footer />
