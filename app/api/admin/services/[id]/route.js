@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/dbConnect';
 import Service from '../../../../models/service';
-import PricingPackage from '../../../../../models/pricingPackage'; // 1. Import PricingPackage
+import PricingPackage from '../../../../models/pricingPackage'; // 1. Import PricingPackage
 import mongoose from 'mongoose';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
