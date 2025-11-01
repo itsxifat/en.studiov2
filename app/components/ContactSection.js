@@ -38,7 +38,7 @@ const ContactSection = () => {
             </p>
             <div className="space-y-4 text-lg font-body">
               <p className="flex items-center gap-4">
-                <Mail className="text-cyan-400" /> hello@motionstudio.com
+                <Mail className="text-cyan-400" /> enfinito.official@gmail.com
               </p>
             </div>
           </div>
