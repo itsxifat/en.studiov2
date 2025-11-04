@@ -35,7 +35,7 @@ const PortfolioSection = () => {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-64">
-          <Loader2 size={32} className="animate-spin text-cyan-500" />
+          <Loader2 size={32} className="animate-spin text-[#53A4DB" />
         </div>
       );
     }
@@ -81,9 +81,9 @@ const PortfolioSection = () => {
                       className="object-cover transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
                       unoptimized={item.thumbnail?.includes('cloudinary') || item.thumbnail?.includes('img.youtube.com')}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent"></div>
                   <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                      <span className="text-xs text-cyan-400 font-body tracking-widest uppercase">
+                      <span className="text-xs text-[#53A4DB] font-body tracking-widest uppercase">
                           {/* ✨ FIX: Display correct category */}
                           {item.type === 'video' ? item.category : 'Photography'}
                       </span>

@@ -326,7 +326,7 @@ export default function ManagePackagesPage() {
                           )}
                           <p className="text-sm text-neutral-300 mt-2">Unit: {pkg.unitPrice} | Total: {pkg.totalPrice}</p>
                       </div>
-                      <div className="flex-shrink-0 flex gap-2">
+                      <div className="shrink-0 flex gap-2">
                           <button onClick={() => handleEditClick(pkg)} className="p-2 text-neutral-400 hover:text-cyan-400"><Edit size={16} /></button>
                           <button onClick={() => handleDelete(pkg._id)} className="p-2 text-neutral-400 hover:text-red-500"><Trash2 size={16} /></button>
                       </div>

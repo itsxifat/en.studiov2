@@ -176,7 +176,7 @@ const Header = () => {
   return (
     <header
       ref={headerRef}
-      className="fixed -top-1 left-0 w-full z-[500] text-white"
+      className="fixed -top-1 left-0 w-full z-500 text-white"
       aria-label="Main navigation"
     >
       <div
@@ -236,17 +236,17 @@ const Header = () => {
         >
           <div className="relative w-5 h-5">
             <span
-              className={`absolute left-0 right-0 top-[3px] h-[2px] bg-white/90 transition-transform duration-300 ${
+              className={`absolute left-0 right-0 top-[3px] h-0.5 bg-white/90 transition-transform duration-300 ${
                 menuOpen ? "translate-y-[7px] rotate-45" : ""
               }`}
             />
             <span
-              className={`absolute left-0 right-0 top-[9px] h-[2px] bg-white/90 transition-opacity duration-300 ${
+              className={`absolute left-0 right-0 top-[9px] h-0.5 bg-white/90 transition-opacity duration-300 ${
                 menuOpen ? "opacity-0" : "opacity-100"
               }`}
             />
             <span
-              className={`absolute left-0 right-0 top-[15px] h-[2px] bg-white/90 transition-transform duration-300 ${
+              className={`absolute left-0 right-0 top-[15px] h-0.5 bg-white/90 transition-transform duration-300 ${
                 menuOpen ? "-translate-y-[7px] -rotate-45" : ""
               }`}
             />
@@ -256,7 +256,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden fixed inset-0 z-[600]" role="dialog" aria-modal="true">
+        <div className="md:hidden fixed inset-0 z-600" role="dialog" aria-modal="true">
           <div ref={backdropRef} className="absolute inset-0 bg-black/50" onClick={closeMenu} />
           <div
             ref={sheetRef}
@@ -327,7 +327,7 @@ const Header = () => {
               <Link
                 href="/quote" // Changed from #contact
                 onClick={closeMenu}
-                className="rounded-xl px-4 py-3 text-center bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 font-semibold text-sm"
+                className="rounded-xl px-4 py-3 text-center bg-linear-to-r from-[#53A4DB] to-blue-500 hover:from-[#53A4DB] hover:to-blue-400 font-semibold text-sm"
               >
                 Get a Quote
               </Link>

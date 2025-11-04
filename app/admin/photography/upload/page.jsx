@@ -207,7 +207,7 @@ export default function UploadPhotographyPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400">
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-[#53A4DB]">
         Upload Project Photo(s)
       </h1>
 
@@ -225,7 +225,7 @@ export default function UploadPhotographyPage() {
               onChange={(e) => setSelectedProject(e.target.value)}
               required
               disabled={isSubmitting || isLoadingProjects}
-              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
             >
               <option value="" disabled>
                 {isLoadingProjects ? 'Loading projects...' : 'Select a project'}
@@ -236,7 +236,7 @@ export default function UploadPhotographyPage() {
             </select>
             {projects.length === 0 && !isLoadingProjects && (
                <p className="text-xs mt-1 text-yellow-400">
-                  No projects found. Please <Link href="/admin/photography/projects" className="underline hover:text-cyan-400">create a project</Link> first.
+                  No projects found. Please <Link href="/admin/photography/projects" className="underline hover:text-[#53A4DB]">create a project</Link> first.
                </p>
             )}
           </div>
@@ -269,12 +269,12 @@ export default function UploadPhotographyPage() {
             )}
             
             <div 
-              className={`flex justify-center items-center w-full px-6 py-10 border-2 border-neutral-700 border-dashed rounded-lg cursor-pointer hover:border-cyan-500 transition-colors`}
+              className={`flex justify-center items-center w-full px-6 py-10 border-2 border-neutral-700 border-dashed rounded-lg cursor-pointer hover:border-[#53A4DB] transition-colors`}
               onClick={() => fileInputRef.current?.click()}
             >
               <div className="space-y-1 text-center">
                 <ImageIcon className="mx-auto h-12 w-12 text-neutral-500" />
-                <p className="text-sm text-neutral-400"><span className="font-semibold text-cyan-400">Click to upload</span> or drag and drop</p>
+                <p className="text-sm text-neutral-400"><span className="font-semibold text-[#53A4DB]">Click to upload</span> or drag and drop</p>
                 <p className="text-xs text-neutral-500">
                   {previews.length > 0 ? `Added ${previews.length} file(s). Click to add more.` : `PNG, JPG, WebP (Max 10MB each)`}
                 </p>
@@ -293,7 +293,7 @@ export default function UploadPhotographyPage() {
           <button
             type="submit"
             disabled={isSubmitting || files.length === 0 || !selectedProject || isLoadingProjects}
-            className="w-full inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center bg-[#53A4DB] hover:bg-[#53A4DB] text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:cursor-not-allowed"
           >
             {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} className="mr-2" />}
             Upload {files.length > 0 ? `${files.length} Photo(s)` : 'Photo(s)'}

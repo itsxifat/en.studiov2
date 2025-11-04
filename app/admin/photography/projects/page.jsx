@@ -172,7 +172,7 @@ export default function ManagePhotoProjectsPage() {
   // --- Function to render the list of projects ---
   const renderProjectsList = () => {
     if (isLoading) {
-      return <div className="flex justify-center mt-10"><Loader2 className="animate-spin text-cyan-500" size={32} /></div>;
+      return <div className="flex justify-center mt-10"><Loader2 className="animate-spin text-[#53A4DB]" size={32} /></div>;
     }
     
     if (error) {
@@ -197,13 +197,13 @@ export default function ManagePhotoProjectsPage() {
             />
             <div className="flex-grow">
               <h3 className="text-lg font-bold text-white">{project.title}</h3>
-              <p className="text-sm text-cyan-400 font-mono">/{project.slug}</p>
+              <p className="text-sm text-[#53A4DB] font-mono">/{project.slug}</p>
               <p className="text-xs text-neutral-400 mt-1 line-clamp-2">{project.description || "No description."}</p>
             </div>
             <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
               <button 
                 onClick={() => handleEditClick(project)} 
-                className="p-2 text-neutral-400 hover:text-cyan-400 transition-colors rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                className="p-2 text-neutral-400 hover:text-[#53A4DB] transition-colors rounded-md focus:outline-none focus:ring-1 focus:ring-[#53A4DB]"
                 aria-label="Edit"
               >
                 <Edit size={16} />
@@ -230,7 +230,7 @@ export default function ManagePhotoProjectsPage() {
         )}
       </AnimatePresence>
 
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400 flex items-center gap-4">
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-[#53A4DB] flex items-center gap-4">
         <FolderHeart size={44} />
         Photo Projects
       </h1>
@@ -244,7 +244,7 @@ export default function ManagePhotoProjectsPage() {
                 <button 
                   type="button" 
                   onClick={clearForm} 
-                  className="text-sm text-neutral-400 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 rounded p-1 -m-1"
+                  className="text-sm text-neutral-400 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-[#53A4DB] rounded p-1 -m-1"
                 >
                   Cancel Edit
                 </button>
@@ -262,7 +262,7 @@ export default function ManagePhotoProjectsPage() {
                 onChange={handleInputChange} 
                 placeholder="e.g., 'Urban Elegance Shoot'" 
                 required 
-                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition" 
+                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition" 
               />
             </div>
             <div>
@@ -275,7 +275,7 @@ export default function ManagePhotoProjectsPage() {
                 onChange={handleInputChange} 
                 placeholder="e.g., 'urban-elegance-shoot'" 
                 required 
-                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition" 
+                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition" 
               />
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function ManagePhotoProjectsPage() {
               onChange={handleInputChange} 
               placeholder="A brief description of the project" 
               rows={3} 
-              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition" 
+              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition" 
             />
           </div>
           
@@ -313,7 +313,7 @@ export default function ManagePhotoProjectsPage() {
           </div>
 
           <button type="submit" disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:text-neutral-400 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center bg-[#53A4DB] hover:bg-[#53A4DB] text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:text-neutral-400 disabled:cursor-not-allowed"
           >
             {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : (editingId ? 'Save Text Changes' : <><Plus size={20} className="mr-2" /> Add Project</>)}
           </button>

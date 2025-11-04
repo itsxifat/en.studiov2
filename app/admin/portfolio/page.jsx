@@ -85,7 +85,7 @@ export default function AdminPortfolioPage() {
         const style = {
             success: 'bg-green-900/50 text-green-400 border-green-700',
             error: 'bg-red-900/50 text-red-400 border-red-700',
-            loading: 'bg-cyan-900/50 text-cyan-400 border-cyan-700',
+            loading: 'bg-cyan-900/50 text-[#53A4DB] border-[#53A4DB]',
         };
         const Icon = status === 'success' ? CheckCircle : status === 'error' ? AlertTriangle : Loader2;
         return (
@@ -103,7 +103,7 @@ export default function AdminPortfolioPage() {
 
     return (
         <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-[#53A4DB]">
                 Add New Portfolio Item
             </h1>
 
@@ -117,7 +117,7 @@ export default function AdminPortfolioPage() {
                         <input
                             id="title" name="title" type="text" required maxLength={100}
                             disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
+                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
                             placeholder="Enter project name"
                         />
                     </div>
@@ -128,7 +128,7 @@ export default function AdminPortfolioPage() {
                         <select
                             id="category" name="category" required defaultValue=""
                             disabled={isSubmitting || categories.length === 0}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white disabled:opacity-50 appearance-none bg-[right_1rem_center] bg-no-repeat"
+                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white disabled:opacity-50 appearance-none bg-[right_1rem_center] bg-no-repeat"
                              style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`}}
                         >
                             <option value="" disabled>
@@ -140,7 +140,7 @@ export default function AdminPortfolioPage() {
                         </select>
                          {categories.length === 0 && !isSubmitting && (
                             <p className="text-sm mt-2 text-yellow-400">
-                                Note: You need to <a href="/admin/category" className="underline font-bold hover:text-cyan-400">add categories</a> first.
+                                Note: You need to <a href="/admin/category" className="underline font-bold hover:text-[#53A4DB]">add categories</a> first.
                             </p>
                          )}
                     </div>
@@ -151,7 +151,7 @@ export default function AdminPortfolioPage() {
                         <textarea
                             id="description" name="description" rows={4}
                             disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
+                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
                             placeholder="Briefly describe the project (optional)"
                         />
                     </div>
@@ -164,7 +164,7 @@ export default function AdminPortfolioPage() {
                             pattern="https?://(www\.)?(youtu\.be/|youtube\.com/(watch\?(.*&)?v=|(embed|v)/))([\w-]{11})(.*)?"
                             placeholder="e.g. https://www.youtube.com/watch?v=VIDEO_ID (Optional)"
                             disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
+                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
                         />
                          <p className="text-xs mt-1 text-neutral-500">The 11-character video ID will be extracted automatically.</p>
                     </div>
@@ -176,7 +176,7 @@ export default function AdminPortfolioPage() {
                             id="thumbnail" name="thumbnail" type="url"
                             placeholder="https://.../image.jpg (Overrides YouTube default)"
                             disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
+                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
                         />
                          <p className="text-xs mt-1 text-neutral-500">Leave blank to use the auto-generated YouTube thumbnail.</p>
                     </div>
@@ -187,7 +187,7 @@ export default function AdminPortfolioPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting || categories.length === 0}
-                        className="w-full inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:text-neutral-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-neutral-900"
+                        className="w-full inline-flex items-center justify-center bg-[#53A4DB] hover:bg-[#53A4DB] text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:text-neutral-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:ring-offset-2 focus:ring-offset-neutral-900"
                     >
                         {isSubmitting ? (
                             <>

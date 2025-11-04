@@ -46,7 +46,7 @@ const ImageLightBox = ({ imageUrl, alt, onClose }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 backdrop-blur-xl"
+      className="fixed inset-0 z-1000 flex items-center justify-center p-4 backdrop-blur-xl"
       style={{ backgroundColor: "rgba(5, 5, 10, 0.92)" }}
       onClick={onClose} // Click backdrop to close
       role="dialog"
@@ -189,13 +189,13 @@ const BehindTheScenes = ({ btsItems }) => {
 const ProjectHeader = ({ project }) => {
   const router = useRouter();
   return (
-    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-gradient-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
+    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-linear-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
       <div className="absolute inset-0 bg-grid-neutral-700/[0.03]" />
       <motion.button
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#53A4DB]"
         aria-label="Go back"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -273,7 +273,7 @@ export default function PhotographyProjectPage() {
   if (isLoading) {
     return (
       <main className="min-h-svh bg-black text-white flex justify-center items-center">
-        <Loader size={40} className="animate-spin text-cyan-500" />
+        <Loader size={40} className="animate-spin text-[#53A4DB]" />
       </main>
     );
   }
@@ -284,7 +284,7 @@ export default function PhotographyProjectPage() {
          <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-800/50 bg-gradient-to-br from-red-900/20 to-neutral-950/40 p-12 py-16 text-center"
+          className="rounded-xl border border-red-800/50 bg-linear-to-br from-red-900/20 to-neutral-950/40 p-12 py-16 text-center"
         >
           <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-5" aria-hidden="true" />
           <h2 className="text-2xl font-bold font-heading text-red-300 mb-2">Error Loading Project</h2>

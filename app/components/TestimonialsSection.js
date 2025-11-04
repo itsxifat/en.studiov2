@@ -54,7 +54,7 @@ const TestimonialsSection = () => {
   // Content rendering based on state
   const renderContent = () => {
     if (isLoading) {
-      return <div className="flex justify-center items-center h-64"><Loader2 className="animate-spin text-cyan-500" size={32} /></div>;
+      return <div className="flex justify-center items-center h-64"><Loader2 className="animate-spin text-[#53A4DB]" size={32} /></div>;
     }
     if (error) {
        return <div className="text-red-400 text-center flex flex-col items-center h-64 justify-center"><AlertTriangle className="mb-2" /> Error loading testimonials.</div>;

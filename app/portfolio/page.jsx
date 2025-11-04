@@ -24,7 +24,7 @@ const PortfolioHeader = () => {
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 inline-flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white hover:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-neutral-900 shadow-lg"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 inline-flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white hover:border-[#53A4DB] focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:ring-offset-2 focus:ring-offset-neutral-900 shadow-lg"
         aria-label="Go back to previous page"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -57,7 +57,7 @@ const PortfolioHeader = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 font-heading">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-cyan-300 to-blue-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-[#53A4DB] to-blue-400">
               Studio Portfolio
             </span>
           </h1>
@@ -103,7 +103,7 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
             {activeTab === tab.id && (
               <motion.div
                 layoutId="active-portfolio-pill"
-                className="absolute inset-0 z-0 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600"
+                className="absolute inset-0 z-0 rounded-lg bg-gradient-to-r from-[#53A4DB] to-blue-600"
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
             )}

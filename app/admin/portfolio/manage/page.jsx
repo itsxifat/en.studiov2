@@ -80,11 +80,11 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
             {/* Form fields (liveUrl and githubUrl removed) */}
             <div>
               <label htmlFor="title" className="block text-sm font-semibold mb-2 text-neutral-300">Project Title *</label>
-              <input id="title" name="title" value={formData.title} onChange={handleChange} required className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" />
+              <input id="title" name="title" value={formData.title} onChange={handleChange} required className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]" />
             </div>
             <div>
               <label htmlFor="category" className="block text-sm font-semibold mb-2 text-neutral-300">Category *</label>
-              <select id="category" name="category" value={formData.category} onChange={handleChange} required className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500">
+              <select id="category" name="category" value={formData.category} onChange={handleChange} required className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]">
                 <option value="" disabled>Select a category</option>
                 {categories.map(cat => (
                   <option key={cat._id} value={cat.name}>{cat.name}</option>
@@ -93,15 +93,15 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
             </div>
             <div>
               <label htmlFor="description" className="block text-sm font-semibold mb-2 text-neutral-300">Description</label>
-              <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" />
+              <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]" />
             </div>
             <div>
               <label htmlFor="youtubeLink" className="block text-sm font-semibold mb-2 text-neutral-300">YouTube Link</label>
-              <input id="youtubeLink" name="youtubeLink" value={formData.youtubeLink} onChange={handleChange} type="url" placeholder="https://www.youtube.com/watch?v=..." className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" />
+              <input id="youtubeLink" name="youtubeLink" value={formData.youtubeLink} onChange={handleChange} type="url" placeholder="https://www.youtube.com/watch?v=..." className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]" />
             </div>
              <div>
               <label htmlFor="thumbnail" className="block text-sm font-semibold mb-2 text-neutral-300">Custom Thumbnail URL (Optional)</label>
-              <input id="thumbnail" name="thumbnail" value={formData.thumbnail} onChange={handleChange} type="url" placeholder="https://.../image.jpg" className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" />
+              <input id="thumbnail" name="thumbnail" value={formData.thumbnail} onChange={handleChange} type="url" placeholder="https://.../image.jpg" className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]" />
               <p className="text-xs mt-1 text-neutral-500">Leave blank to auto-generate from YouTube link.</p>
             </div>
           </div>
@@ -109,7 +109,7 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
             <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-neutral-300 bg-neutral-700 hover:bg-neutral-600 rounded-md transition disabled:opacity-50">
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-black bg-cyan-500 hover:bg-cyan-400 rounded-md transition disabled:opacity-50 flex items-center gap-2">
+            <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-black bg-[#53A4DB] hover:bg-[#53A4DB] rounded-md transition disabled:opacity-50 flex items-center gap-2">
               {isSubmitting && <Loader2 size={16} className="animate-spin" />}
               Save Changes
             </button>
@@ -234,7 +234,7 @@ export default function ManageVideoPortfolioPage() {
   
   const renderContent = () => {
     if (isLoading) {
-      return <div className="flex justify-center items-center min-h-[50vh]"><Loader2 size={40} className="animate-spin text-cyan-500" /></div>;
+      return <div className="flex justify-center items-center min-h-[50vh]"><Loader2 size={40} className="animate-spin text-[#53A4DB]" /></div>;
     }
     if (error) {
       return <div className="text-center p-8 bg-neutral-900/50 border border-red-700 rounded-lg text-red-400"><AlertTriangle size={48} className="mx-auto mb-4" />{error}</div>;
@@ -244,7 +244,7 @@ export default function ManageVideoPortfolioPage() {
         <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8 bg-neutral-900/50 border border-neutral-700 rounded-lg">
           <SearchX size={48} className="text-neutral-500 mb-4" />
           <h2 className="text-2xl font-bold text-neutral-300 mb-2">No Video Projects Found</h2>
-          <p className="text-neutral-400">Please <Link href="/admin/portfolio" className="text-cyan-400 hover:underline">add a video project</Link> first.</p>
+          <p className="text-neutral-400">Please <Link href="/admin/portfolio" className="text-[#53A4DB] hover:underline">add a video project</Link> first.</p>
         </div>
       );
     }
@@ -277,12 +277,12 @@ export default function ManageVideoPortfolioPage() {
                       <div className="text-xs text-neutral-400 font-mono">{item.youtubeId || "No Video ID"}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                       <span className="px-2 py-1 text-xs font-semibold rounded-full bg-cyan-900/50 text-cyan-300 border border-cyan-700/50">
+                       <span className="px-2 py-1 text-xs font-semibold rounded-full bg-cyan-900/50 text-[#53A4DB] border border-cyan-700/50">
                         {item.category}
                        </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <button onClick={() => handleEditClick(item)} className="p-2 text-neutral-400 hover:text-cyan-400"><Edit size={16} /></button>
+                      <button onClick={() => handleEditClick(item)} className="p-2 text-neutral-400 hover:text-[#53A4DB]"><Edit size={16} /></button>
                       <button onClick={() => handleDelete(item._id)} className="p-2 text-neutral-400 hover:text-red-500"><Trash2 size={16} /></button>
                     </td>
                   </motion.tr>
@@ -304,13 +304,13 @@ export default function ManageVideoPortfolioPage() {
               >
                 <Image src={item.thumbnail || '/placeholder.jpg'} alt={item.title} width={300} height={169} className="w-full object-cover aspect-video bg-neutral-700" unoptimized />
                 <div className="p-4">
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-cyan-900/50 text-cyan-300 border border-cyan-700/50">
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-cyan-900/50 text-[#53A4DB] border border-cyan-700/50">
                     {item.category}
                   </span>
                   <h3 className="text-base font-semibold text-white mt-2 truncate">{item.title}</h3>
                   <p className="text-xs text-neutral-400 font-mono truncate">{item.youtubeId || "No Video ID"}</p>
                   <div className="flex gap-2 mt-4">
-                    <button onClick={() => handleEditClick(item)} className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-cyan-400 bg-cyan-900/30 hover:bg-cyan-900/60 h-10 px-4 rounded-md transition-colors border border-cyan-800/50">
+                    <button onClick={() => handleEditClick(item)} className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-[#53A4DB] bg-cyan-900/30 hover:bg-cyan-900/60 h-10 px-4 rounded-md transition-colors border border-cyan-800/50">
                       <Edit size={14} /> Edit
                     </button>
                     <button onClick={() => handleDelete(item._id)} className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-red-500 bg-red-900/30 hover:bg-red-900/60 h-10 px-4 rounded-md transition-colors border border-red-800/50">
@@ -333,7 +333,7 @@ export default function ManageVideoPortfolioPage() {
       </AnimatePresence>
       
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-heading uppercase text-cyan-400 flex items-center gap-4">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-heading uppercase text-[#53A4DB] flex items-center gap-4">
           <ListVideo size={44} />
           Manage Videos
         </h1>
@@ -344,7 +344,7 @@ export default function ManageVideoPortfolioPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by title or category..."
-            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 pl-10 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white"
+            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 pl-10 rounded-lg focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition text-white"
           />
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
         </div>

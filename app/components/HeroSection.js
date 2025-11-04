@@ -57,7 +57,7 @@ const HeroSection = () => {
           Powerful Storytelling
           <br />
           <span 
-            className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
+            className="text-transparent bg-clip-text bg-linear-to-r from-[#53A4DB] to-blue-500"
           >
             Stunning Visuals.
           </span>

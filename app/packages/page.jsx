@@ -17,7 +17,7 @@ const PackagesHeader = () => {
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#53A4DB]"
         aria-label="Go back"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -30,7 +30,7 @@ const PackagesHeader = () => {
           transition={{ duration: 0.6 }}
           className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-3 font-heading"
         >
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-neutral-100 via-cyan-300 to-blue-400">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-neutral-100 via-[#53A4DB] to-blue-400">
             Packages & Pricing
           </span>
         </motion.h1>
@@ -63,7 +63,7 @@ const PackageRow = ({ pkg, isHeader = false }) => {
       <div className={`w-1/4 ${cellClass} ${textClass} text-right`}>
         {pkg.unitPrice}
       </div>
-      <div className={`w-1/4 ${cellClass} ${textClass} text-right ${!isHeader ? 'font-semibold text-cyan-400' : ''}`}>
+      <div className={`w-1/4 ${cellClass} ${textClass} text-right ${!isHeader ? 'font-semibold text-[#53A4DB]' : ''}`}>
         {pkg.totalPrice}
       </div>
     </div>
@@ -115,7 +115,7 @@ function PackagesPageClient() {
     if (isLoading) {
       return (
         <div className="w-full h-64 flex justify-center items-center">
-          <Loader2 className="animate-spin text-cyan-500" size={32} />
+          <Loader2 className="animate-spin text-[#53A4DB]" size={32} />
         </div>
       );
     }
@@ -178,7 +178,7 @@ function PackagesPageClient() {
                 {activeTab === 'Reel' && (
                   <motion.div
                     layoutId="active-package-pill"
-                    className="absolute inset-0 z-0 rounded-lg bg-cyan-400"
+                    className="absolute inset-0 z-0 rounded-lg bg-[#53A4DB]"
                     transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}
@@ -196,7 +196,7 @@ function PackagesPageClient() {
                 {activeTab === 'Photography' && (
                   <motion.div
                     layoutId="active-package-pill"
-                    className="absolute inset-0 z-0 rounded-lg bg-cyan-400"
+                    className="absolute inset-0 z-0 rounded-lg bg-[#53A4DB]"
                     transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}

@@ -82,7 +82,7 @@ const Sidebar = () => (
             <Link
               href={link.href}
               // Removed focus:ring-* classes
-              className="flex items-center gap-3 px-4 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-cyan-400 transition-colors duration-200 focus:outline-none focus:bg-neutral-800"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-[#53A4DB] transition-colors duration-200 focus:outline-none focus:bg-neutral-800"
             >
               <Icon size={20} />
               <span className="font-semibold text-sm tracking-wide">{link.label}</span>

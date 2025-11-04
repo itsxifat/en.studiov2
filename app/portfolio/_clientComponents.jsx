@@ -353,7 +353,7 @@ export function Toolbar({ filter, setFilter, q, setQ, sort, setSort, categories 
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search projects..."
               type="search"
-              className="h-10 w-full rounded-lg border border-neutral-700/80 bg-neutral-800/50 pl-9 pr-4 text-sm text-white placeholder:text-neutral-500/90 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 sm:w-[200px] transition-all duration-200"
+              className="h-10 w-full rounded-lg border border-neutral-700/80 bg-neutral-800/50 pl-9 pr-4 text-sm text-white placeholder:text-neutral-500/90 focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] sm:w-[200px] transition-all duration-200"
             />
           </div>
           <div className="relative w-full sm:w-auto">
@@ -364,7 +364,7 @@ export function Toolbar({ filter, setFilter, q, setQ, sort, setSort, categories 
               id="portfolio-sort"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="h-10 w-full appearance-none rounded-lg border border-neutral-700/80 bg-neutral-800/50 py-0 pl-4 pr-9 text-sm text-neutral-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 sm:w-auto cursor-pointer transition-all duration-200"
+              className="h-10 w-full appearance-none rounded-lg border border-neutral-700/80 bg-neutral-800/50 py-0 pl-4 pr-9 text-sm text-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] sm:w-auto cursor-pointer transition-all duration-200"
             >
               <option value="newest" className="bg-neutral-800 text-white">Newest First</option>
               <option value="title" className="bg-neutral-800 text-white">Title A–Z</option>
@@ -437,7 +437,7 @@ export function ClientPortfolioPage({
     if (isLoading) {
       return (
         <div className="flex min-h-[50vh] flex-col items-center justify-center text-center py-20">
-          <Loader2 size={40} className="animate-spin text-cyan-500 mb-4" aria-label="Loading projects" />
+          <Loader2 size={40} className="animate-spin text-[#53A4DB] mb-4" aria-label="Loading projects" />
           <p className="text-lg text-neutral-400 font-medium">Loading Projects...</p>
           <p className="text-sm text-neutral-500 mt-2">Please wait while we fetch amazing work</p>
         </div>
@@ -476,7 +476,7 @@ export function ClientPortfolioPage({
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
               onClick={() => setPage((prevPage) => prevPage + 1)}
-              className="group inline-flex items-center gap-3 rounded-full border-2 border-cyan-600/70 bg-gradient-to-br from-cyan-900/50 to-blue-900/40 backdrop-blur-sm px-8 py-4 text-sm font-bold uppercase tracking-wider text-cyan-300 shadow-xl shadow-cyan-500/20 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 hover:bg-gradient-to-br hover:from-cyan-800/60 hover:to-blue-800/50 hover:border-cyan-500 hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black"
+              className="group inline-flex items-center gap-3 rounded-full border-2 border-cyan-600/70 bg-gradient-to-br from-cyan-900/50 to-blue-900/40 backdrop-blur-sm px-8 py-4 text-sm font-bold uppercase tracking-wider text-cyan-300 shadow-xl shadow-cyan-500/20 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 hover:bg-gradient-to-br hover:from-cyan-800/60 hover:to-blue-800/50 hover:border-[#53A4DB] hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:ring-offset-2 focus:ring-offset-black"
             >
               Load More Projects 
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1 duration-200" aria-hidden="true" />

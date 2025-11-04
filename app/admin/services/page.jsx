@@ -145,7 +145,7 @@ export default function ManageServicesPage() {
         )}
       </AnimatePresence>
 
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400">
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-[#53A4DB]">
         Manage Services
       </h1>
 
@@ -154,7 +154,7 @@ export default function ManageServicesPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex justify-between items-center mb-4">
              <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
-                <FormIcon className="text-cyan-400" />
+                <FormIcon className="text-[#53A4DB]" />
                 {editingId ? 'Edit Service' : 'Add New Service'}
              </h2>
              {editingId && (
@@ -165,7 +165,7 @@ export default function ManageServicesPage() {
           <div>
             <label htmlFor="title" className="block text-sm font-semibold mb-2 text-neutral-300">Title *</label>
             <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required maxLength={100} disabled={isSubmitting}
-              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
             />
           </div>
 
@@ -173,14 +173,14 @@ export default function ManageServicesPage() {
             <div>
               <label htmlFor="icon" className="block text-sm font-semibold mb-2 text-neutral-300">Icon Name *</label>
               <input type="text" id="icon" name="icon" value={formData.icon} onChange={handleInputChange} required maxLength={50} disabled={isSubmitting}
-                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
               />
               <p className="text-xs mt-1 text-neutral-500">e.g., &quot;Film&quot;, &quot;Camera&quot; (from lucide.dev)</p>
             </div>
              <div>
               <label htmlFor="startingPrice" className="block text-sm font-semibold mb-2 text-neutral-300">Starting Price *</label>
               <input type="text" id="startingPrice" name="startingPrice" value={formData.startingPrice} onChange={handleInputChange} required maxLength={50} disabled={isSubmitting}
-                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
                 placeholder="e.g., 4,000 or Negotiable"
               />
             </div>
@@ -189,19 +189,19 @@ export default function ManageServicesPage() {
           <div>
             <label htmlFor="description" className="block text-sm font-semibold mb-2 text-neutral-300">Description *</label>
             <textarea id="description" name="description" value={formData.description} onChange={handleInputChange} required rows={3} maxLength={500} disabled={isSubmitting}
-              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
             />
           </div>
 
           <div>
             <label htmlFor="displayOrder" className="block text-sm font-semibold mb-2 text-neutral-300">Display Order *</label>
             <input type="number" id="displayOrder" name="displayOrder" value={formData.displayOrder} onChange={handleInputChange} required disabled={isSubmitting}
-              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500"
+              className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]"
             />
           </div>
           
           <button type="submit" disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center bg-[#53A4DB] hover:bg-cyan-600 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:cursor-not-allowed"
           >
             {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : (editingId ? 'Save Changes' : 'Add Service')}
           </button>
@@ -211,7 +211,7 @@ export default function ManageServicesPage() {
       {/* Existing Services List */}
       <h2 className="text-2xl font-semibold text-white mb-6">Existing Services</h2>
       {isLoading ? (
-        <div className="flex justify-center mt-10"><Loader2 className="animate-spin text-cyan-500" size={32} /></div>
+        <div className="flex justify-center mt-10"><Loader2 className="animate-spin text-[#53A4DB]" size={32} /></div>
       ) : error ? (
         <div className="text-red-400 text-center mt-10"><AlertTriangle className="inline mr-2" /> Error: {error}</div>
       ) : services.length === 0 ? (
@@ -222,14 +222,14 @@ export default function ManageServicesPage() {
             const ServiceIcon = IconMap[service.icon] || Layers;
             return (
               <div key={service._id} className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 flex items-start gap-4">
-                <ServiceIcon className="text-cyan-400 w-6 h-6 flex-shrink-0 mt-1" />
+                <ServiceIcon className="text-[#53A4DB] w-6 h-6 flex-shrink-0 mt-1" />
                 <div className="flex-grow">
                   <h3 className="text-lg font-bold text-white">(Order: {service.displayOrder}) {service.title}</h3>
                   <p className="text-sm text-neutral-400 mb-2">{service.description}</p>
-                  <p className="text-sm font-semibold text-cyan-400">Starting at ৳{service.startingPrice}</p>
+                  <p className="text-sm font-semibold text-[#53A4DB]">Starting at ৳{service.startingPrice}</p>
                 </div>
                 <div className="flex-shrink-0 flex gap-2">
-                  <button onClick={() => handleEditClick(service)} className="p-2 text-neutral-400 hover:text-cyan-400"><Edit size={16} /></button>
+                  <button onClick={() => handleEditClick(service)} className="p-2 text-neutral-400 hover:text-[#53A4DB]"><Edit size={16} /></button>
                   <button onClick={() => handleDelete(service._id)} className="p-2 text-neutral-400 hover:text-red-500"><Trash2 size={16} /></button>
                 </div>
               </div>

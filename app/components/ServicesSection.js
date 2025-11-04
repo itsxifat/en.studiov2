@@ -12,7 +12,7 @@ const IconMap = {
 };
 const getIcon = (name) => {
   const Icon = IconMap[name];
-  return Icon ? <Icon className="h-8 w-8 text-cyan-400" /> : <IconMap.default className="h-8 w-8 text-cyan-400" />;
+  return Icon ? <Icon className="h-8 w-8 text-[#53A4DB]" /> : <IconMap.default className="h-8 w-8 text-[#53A4DB]" />;
 };
 
 // --- Service Card Component ---
@@ -26,12 +26,12 @@ const ServiceCard = ({ service, index }) => (
     >
       <div className="mb-6">{getIcon(service.icon)}</div>
       <h3 className="text-2xl font-bold mb-3 font-heading text-white">{service.title}</h3>
-      <p className="text-neutral-400 mb-4 font-body flex-grow">{service.description}</p>
+      <p className="text-neutral-400 mb-4 font-body grow">{service.description}</p>
       <div className="flex justify-between items-center mt-auto">
-        <p className="text-cyan-400 font-semibold font-body">
+        <p className="text-[#53A4DB] font-semibold font-body">
           Starting at ৳{service.startingPrice}
         </p>
-        <ArrowRight className="text-neutral-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-transform" size={20} />
+        <ArrowRight className="text-neutral-600 group-hover:text-[#53A4DB] group-hover:translate-x-1 transition-transform" size={20} />
       </div>
     </motion.div>
   </Link>

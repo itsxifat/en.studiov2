@@ -79,7 +79,7 @@ const FormMessage = ({ status, message }) => {
       transition={{ type: "spring", stiffness: 300, damping: 20 }} // Snappier spring
       className={`flex items-start gap-3 p-4 rounded-lg border ${style[status]} mb-6`}
     >
-      <Icon size={20} className="flex-shrink-0 mt-0.5" />
+      <Icon size={20} className="shrink-0 mt-0.5" />
       <p className="font-semibold text-sm">{message}</p>
     </motion.div>
   );
@@ -171,7 +171,7 @@ export default function QuotePage() {
         whileTap={{ scale: 0.95 }}
         className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all 
                    hover:bg-neutral-800/80 hover:text-white 
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[#53A4DB] 
                    focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         aria-label="Go back"
         initial={{ opacity: 0, scale: 0.8 }}
@@ -240,7 +240,7 @@ export default function QuotePage() {
                   value={formData.name} onChange={handleInputChange}
                   required 
                   className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
-                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             focus:border-[#53A4DB] focus:ring-1 focus:ring-[#53A4DB]
                              transition-colors disabled:opacity-50"
                   disabled={isLoading}
                 />
@@ -252,7 +252,7 @@ export default function QuotePage() {
                   value={formData.email} onChange={handleInputChange}
                   required 
                   className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
-                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             focus:border-[#53A4DB] focus:ring-1 focus:ring-[#53A4DB]
                              transition-colors disabled:opacity-50"
                   disabled={isLoading}
                 />
@@ -267,7 +267,7 @@ export default function QuotePage() {
                   value={formData.phone} onChange={handleInputChange}
                   required
                   className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
-                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             focus:border-[#53A4DB] focus:ring-1 focus:ring-[#53A4DB] 
                              transition-colors disabled:opacity-50"
                   disabled={isLoading}
                 />
@@ -279,7 +279,7 @@ export default function QuotePage() {
                   value={formData.whatsapp} onChange={handleInputChange}
                   required
                   className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
-                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             focus:border-[#53A4DB] focus:ring-1 focus:ring-[#53A4DB] 
                              transition-colors disabled:opacity-50"
                   disabled={isLoading}
                 />
@@ -293,7 +293,7 @@ export default function QuotePage() {
                 value={formData.details} onChange={handleInputChange}
                 required
                 className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
-                           focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                           focus:border-[#53A4DB] focus:ring-1 focus:ring-[#53A4DB] 
                            transition-colors disabled:opacity-50" 
                 placeholder="What are you looking to create? What is your timeline?"
                 disabled={isLoading}

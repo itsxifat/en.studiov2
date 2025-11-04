@@ -9,16 +9,16 @@ import Link from 'next/link';
 const PackagesHeader = ({ title, description }) => {
   const router = useRouter();
   return (
-    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-gradient-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
+    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-linear-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
       <div className="absolute inset-0 bg-grid-neutral-700/[0.03]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
       
       <motion.button
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
         className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white 
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black" // Professional focus
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[#53A4DB] focus-visible:ring-offset-2 focus-visible:ring-offset-black" // Professional focus
         aria-label="Go back"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -31,7 +31,7 @@ const PackagesHeader = ({ title, description }) => {
           transition={{ duration: 0.6 }}
           className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-3 font-heading"
         >
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-cyan-300 to-blue-400">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-neutral-100 via-[#53A4DB] to-blue-400">
             {title || 'Packages & Pricing'}
           </span>
         </motion.h1>
@@ -54,7 +54,7 @@ const PackageCard = ({ pkg }) => {
     <div className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-5 flex flex-col">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-bold text-white font-heading">{pkg.packageName}</h3>
-        <span className="text-lg font-semibold text-cyan-400 flex-shrink-0 ml-4">{pkg.totalPrice}</span>
+        <span className="text-lg font-semibold text-[#53A4DB] shrink-0 ml-4">{pkg.totalPrice}</span>
       </div>
       
       {pkg.description && (
@@ -95,7 +95,7 @@ const PackageRow = ({ pkg, isHeader = false }) => {
       <div className={`w-1/5 ${cellClass} ${textClass} text-right`}>
         {pkg.unitPrice}
       </div>
-      <div className={`w-1/5 ${cellClass} ${textClass} text-right ${!isHeader ? 'font-semibold text-cyan-400' : ''}`}>
+      <div className={`w-1/5 ${cellClass} ${textClass} text-right ${!isHeader ? 'font-semibold text-[#53A4DB]' : ''}`}>
         {pkg.totalPrice}
       </div>
     </div>
@@ -157,7 +157,7 @@ function PackagesPageClient() {
     if (isLoading) {
       return (
         <div className="w-full min-h-[30vh] flex justify-center items-center">
-          <Loader2 className="animate-spin text-cyan-500" size={32} />
+          <Loader2 className="animate-spin text-[#53A4DB]" size={32} />
         </div>
       );
     }
@@ -234,7 +234,7 @@ function PackagesPageClient() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }} // Fades in after table
-          className="mt-16 p-8 bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border border-neutral-800 rounded-lg 
+          className="mt-16 p-8 bg-linear-to-r from-cyan-900/30 to-blue-900/30 border border-neutral-800 rounded-lg 
                      flex flex-col md:flex-row md:items-center justify-between gap-6"
         >
           <div>
@@ -294,7 +294,7 @@ export default function PackagesPage() {
   return (
     <Suspense fallback={
       <div className="bg-black min-h-screen w-full flex items-center justify-center">
-        <Loader2 className="animate-spin text-cyan-500" size={40} />
+        <Loader2 className="animate-spin text-[#53A4DB]" size={40} />
       </div>
     }>
       <PackagesPageClient />

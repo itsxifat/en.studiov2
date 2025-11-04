@@ -20,7 +20,7 @@ const FormMessage = ({ status, message }) => {
       transition={{ duration: 0.3 }}
       className={`flex items-start gap-3 p-4 rounded-lg border ${style[status]} mb-6`}
     >
-      <Icon size={20} className="flex-shrink-0 mt-0.5" />
+      <Icon size={20} className="shrink-0 mt-0.5" />
       <p className="font-semibold text-sm">{message}</p>
     </motion.div>
   );
@@ -97,9 +97,9 @@ const ContactSection = () => {
             <div className="space-y-5 text-base sm:text-lg font-body">
               <a 
                 href="mailto:enfinito.official@gmail.com"
-                className="flex items-center gap-4 text-neutral-200 hover:text-cyan-400 transition-colors"
+                className="flex items-center gap-4 text-neutral-200 hover:text-[#53A4DB] transition-colors"
               >
-                <Mail className="text-cyan-400 flex-shrink-0" size={24} />
+                <Mail className="text-[#53A4DB] shrink-0" size={24} />
                 enfinito.official@gmail.com
               </a>
               {/* ✨ NEW: WhatsApp Link ✨ */}
@@ -108,9 +108,9 @@ const ContactSection = () => {
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 text-neutral-200 hover:text-cyan-400 transition-colors"
+                  className="flex items-center gap-4 text-neutral-200 hover:text-[#53A4DB] transition-colors"
                 >
-                  <MessageSquare className="text-cyan-400 flex-shrink-0" size={24} />
+                  <MessageSquare className="text-[#53A4DB] shrink-0" size={24} />
                   Chat with us on WhatsApp
                 </Link>
               )}
@@ -141,7 +141,7 @@ const ContactSection = () => {
                       onChange={handleInputChange}
                       required
                       disabled={isLoading}
-                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition-all rounded-md disabled:opacity-50"
+                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition-all rounded-md disabled:opacity-50"
                     />
                   </div>
                   {/* Email */}
@@ -156,7 +156,7 @@ const ContactSection = () => {
                       onChange={handleInputChange}
                       required
                       disabled={isLoading}
-                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition-all rounded-md disabled:opacity-50"
+                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition-all rounded-md disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -175,7 +175,7 @@ const ContactSection = () => {
                       onChange={handleInputChange}
                       required
                       disabled={isLoading}
-                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition-all rounded-md disabled:opacity-50"
+                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition-all rounded-md disabled:opacity-50"
                     />
                   </div>
                   {/* WhatsApp Number */}
@@ -190,7 +190,7 @@ const ContactSection = () => {
                       onChange={handleInputChange}
                       required
                       disabled={isLoading}
-                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition-all rounded-md disabled:opacity-50"
+                      className="font-body w-full bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition-all rounded-md disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -207,7 +207,7 @@ const ContactSection = () => {
                     onChange={handleInputChange}
                     required
                     disabled={isLoading}
-                    className="w-full font-body bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition-all rounded-md disabled:opacity-50"
+                    className="w-full font-body bg-neutral-800 border-2 border-neutral-700 p-3 focus:ring-2 focus:ring-[#53A4DB] focus:border-[#53A4DB] focus:outline-none transition-all rounded-md disabled:opacity-50"
                   ></textarea>
                 </div>
                 

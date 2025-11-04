@@ -32,14 +32,14 @@ const ProjectCard = ({ project }) => {
         
         {/* Content Container */}
         <div className="p-5 flex flex-col flex-grow">
-          <h3 className="text-xl font-bold font-heading text-white mb-2 line-clamp-2 group-hover:text-cyan-400 transition-colors">
+          <h3 className="text-xl font-bold font-heading text-white mb-2 line-clamp-2 group-hover:text-[#53A4DB] transition-colors">
             {project.title}
           </h3>
           <p className="text-sm text-neutral-400 line-clamp-3 mb-4 flex-grow">
             {project.description}
           </p>
           <div className="mt-auto pt-3 border-t border-neutral-800/50">
-            <p className="flex items-center justify-end text-sm font-semibold text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="flex items-center justify-end text-sm font-semibold text-[#53A4DB] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               View Project
               <ArrowRight size={16} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
             </p>
@@ -84,7 +84,7 @@ export function PhotographyGallery() {
     if (isLoading) {
       return (
         <div className="flex min-h-[50vh] flex-col items-center justify-center text-center py-20">
-          <Loader size={40} className="animate-spin text-cyan-500 mb-4" aria-label="Loading projects" />
+          <Loader size={40} className="animate-spin text-[#53A4DB] mb-4" aria-label="Loading projects" />
           <p className="text-lg text-neutral-400 font-medium">Loading Photography Projects...</p>
         </div>
       );
