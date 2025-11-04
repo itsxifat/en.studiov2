@@ -1,19 +1,17 @@
-// app/admin/portfolio/page.jsx
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 const CATEGORY_API = '/api/admin/category';
-const PORTFOLIO_API = '/api/portfolio'; // Added constant
+const PORTFOLIO_API = '/api/portfolio'; 
 
 export default function AdminPortfolioPage() {
-    const [status, setStatus] = useState(null); // null, 'loading', 'success', 'error'
+    const [status, setStatus] = useState(null);
     const [message, setMessage] = useState('');
     const [categories, setCategories] = useState([]);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Fetch categories on load
     const fetchCategories = useCallback(async () => {
         try {
             const res = await fetch(CATEGORY_API);
@@ -37,21 +35,21 @@ export default function AdminPortfolioPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isSubmitting) return; // Prevent double submission
+        if (isSubmitting) return;
 
         setIsSubmitting(true);
         setStatus('loading');
         setMessage('Adding portfolio item...');
 
         const form = e.target;
+        // ✨ formData object now only includes the fields we need
         const formData = {
             title: form.title.value,
             category: form.category.value,
-            description: form.description.value, // ✨ ADDED
+            description: form.description.value,
             youtubeLink: form.youtubeLink.value,
             thumbnail: form.thumbnail.value,
-            liveUrl: form.liveUrl.value, // ✨ ADDED
-            githubUrl: form.githubUrl.value, // ✨ ADDED
+            // liveUrl and githubUrl removed
         };
 
         try {
@@ -75,15 +73,14 @@ export default function AdminPortfolioPage() {
             setStatus('error');
             setMessage(`Network Error: ${error.message || 'Failed to submit.'}`);
         } finally {
-            setIsSubmitting(false); // Re-enable form
-            // Keep message displayed longer on error
-            setTimeout(() => setStatus(null), status === 'error' ? 8000 : 5000);
+            setIsSubmitting(false);
+            // Keep message displayed for 5 seconds
+            setTimeout(() => setStatus(null), 5000); 
         }
     };
 
-    // Dynamic message box component (no changes needed)
+    // Dynamic message box component
     const Message = ({ status, message }) => {
-        // ... (keep existing Message component code)
         if (!status) return null;
         const style = {
             success: 'bg-green-900/50 text-green-400 border-green-700',
@@ -96,7 +93,7 @@ export default function AdminPortfolioPage() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className={`flex items-center gap-3 p-4 rounded-lg border ${style[status]} mb-6`} // Added margin-bottom
+                className={`flex items-center gap-3 p-4 rounded-lg border ${style[status]} mb-6`}
             >
                 <Icon size={20} className={status === 'loading' ? 'animate-spin' : ''} />
                 <p className="font-semibold">{message}</p>
@@ -105,14 +102,13 @@ export default function AdminPortfolioPage() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto"> {/* Centered form */}
+        <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400">
                 Add New Portfolio Item
             </h1>
 
             <AnimatePresence>{status && <Message status={status} message={message} key="message" />}</AnimatePresence>
 
-            {/* Adjusted styles for better appearance */}
             <div className="bg-neutral-900/70 border border-neutral-700/50 p-8 rounded-xl shadow-lg mt-8 backdrop-blur-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     {/* Title */}
@@ -142,11 +138,11 @@ export default function AdminPortfolioPage() {
                                 <option key={cat._id} value={cat.name}>{cat.name}</option>
                             ))}
                         </select>
-                         {categories.length === 0 && (
+                         {categories.length === 0 && !isSubmitting && (
                             <p className="text-sm mt-2 text-yellow-400">
-                                Note: You need to <a href="/admin/category" className="underline font-bold hover:text-cyan-400">add categories</a> before you can assign one.
+                                Note: You need to <a href="/admin/category" className="underline font-bold hover:text-cyan-400">add categories</a> first.
                             </p>
-                        )}
+                         )}
                     </div>
 
                     {/* Description */}
@@ -165,7 +161,7 @@ export default function AdminPortfolioPage() {
                         <label htmlFor="youtubeLink" className="block text-sm font-semibold mb-2 text-neutral-300">YouTube Link (URL)</label>
                         <input
                             id="youtubeLink" name="youtubeLink" type="url"
-                            pattern="https?://(www\.)?(youtu\.be/|youtube\.com/(watch\?(.*&)?v=|(embed|v)/))([\w-]{11})(.*)?" // Basic pattern
+                            pattern="https?://(www\.)?(youtu\.be/|youtube\.com/(watch\?(.*&)?v=|(embed|v)/))([\w-]{11})(.*)?"
                             placeholder="e.g. https://www.youtube.com/watch?v=VIDEO_ID (Optional)"
                             disabled={isSubmitting}
                             className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
@@ -182,30 +178,10 @@ export default function AdminPortfolioPage() {
                             disabled={isSubmitting}
                             className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
                         />
-                         <p className="text-xs mt-1 text-neutral-500">Leave blank to use the auto-generated YouTube thumbnail if a link is provided.</p>
+                         <p className="text-xs mt-1 text-neutral-500">Leave blank to use the auto-generated YouTube thumbnail.</p>
                     </div>
 
-                    {/* Live URL */}
-                    <div>
-                        <label htmlFor="liveUrl" className="block text-sm font-semibold mb-2 text-neutral-300">Live Site URL (Optional)</label>
-                        <input
-                            id="liveUrl" name="liveUrl" type="url"
-                            placeholder="https://example.com"
-                            disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
-                        />
-                    </div>
-
-                     {/* GitHub URL */}
-                    <div>
-                        <label htmlFor="githubUrl" className="block text-sm font-semibold mb-2 text-neutral-300">GitHub Repo URL (Optional)</label>
-                        <input
-                            id="githubUrl" name="githubUrl" type="url"
-                            placeholder="https://github.com/user/repo"
-                            disabled={isSubmitting}
-                            className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none transition text-white placeholder-neutral-500 disabled:opacity-50"
-                        />
-                    </div>
+                    {/* ✨ Live URL and GitHub URL fields are REMOVED ✨ */}
 
                     {/* Submit Button */}
                     <button

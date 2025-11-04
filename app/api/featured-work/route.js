@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../lib/dbConnect';
 import PortfolioItem from '../../models/portfolioItem';
-import { v2 as cloudinary } from 'cloudinary';
+import PhotoProject from '../../models/photoProject'; // ✨ Import PhotoProject
 
-// ✨ ADD THIS CONFIGURATION BLOCK ✨
+// Configure Cloudinary
+import { v2 as cloudinary } from 'cloudinary';
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true, // Optional but recommended
+  secure: true,
 });
-// ✨ END OF CONFIGURATION BLOCK ✨
 
 export async function GET() {
   await dbConnect();
@@ -21,25 +21,22 @@ export async function GET() {
       .select('title category thumbnail youtubeId _id createdAt')
       .lean();
 
-    // 2. Fetch Featured Photos (This part will now work)
-    const { resources: cloudinaryPhotos } = await cloudinary.search
-      .expression('folder:portfolio AND context.isFeatured=true')
-      .sort_by('created_at', 'desc')
-      .with_field('context')
-      .max_results(30)
-      .execute(); // This line was failing
+    // ✨ 2. Fetch Featured Photo Projects
+    const featuredPhotoProjects = await PhotoProject.find({ isFeatured: true })
+      .sort({ createdAt: -1 })
+      .select('title slug thumbnail createdAt') // Select the slug
+      .lean();
 
-    // Map Cloudinary photos
-    const featuredPhotos = cloudinaryPhotos.map(file => ({
-      _id: file.public_id,
-      title: file.context?.title || file.filename || 'Untitled Photo',
+    // Map Photo Projects
+    const featuredPhotos = featuredPhotoProjects.map(project => ({
+      _id: project._id,
+      title: project.title,
       category: 'Photography', // Assign a default category
-      thumbnail: cloudinary.url(file.public_id, {
-        width: 600, height: 400, crop: 'fill', quality: 'auto:good', fetch_format: 'auto'
-      }),
+      thumbnail: project.thumbnail,
       youtubeId: null,
-      createdAt: file.created_at,
-      type: 'photo'
+      slug: project.slug, // Pass the slug
+      createdAt: project.createdAt,
+      type: 'photoProject' // Set the type
     }));
 
      // Map MongoDB videos
@@ -57,10 +54,6 @@ export async function GET() {
 
   } catch (error) {
     console.error('API_FEATURED_WORK_GET_ERROR:', error);
-    // Add specific check for config error
-    if (error.message.includes('Must supply cloud_name')) {
-        console.error('>>> Cloudinary credentials might be missing in .env.local or not loaded correctly.');
-    }
     return NextResponse.json({ success: false, error: 'Failed to fetch featured work.' }, { status: 500 });
   }
 }

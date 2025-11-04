@@ -1,8 +1,22 @@
 "use client"; // Required for hooks and client-side components
 
-import React from 'react'; // Added React import
+import React from 'react';
 import Link from 'next/link';
-import { Video, List, LayoutDashboard, Camera, UploadCloud, Star, MessageSquareText, Layers, Package, FolderHeart, Clapperboard } from 'lucide-react';
+// ✨ Import 'ListVideo' icon
+import { 
+  Video, 
+  List, 
+  LayoutDashboard, 
+  Camera, 
+  UploadCloud, 
+  Star, 
+  MessageSquareText, 
+  Layers, 
+  Package, 
+  FolderHeart, 
+  Clapperboard,
+  ListVideo // ✨ Added here
+} from 'lucide-react';
 import { Bai_Jamjuree } from "next/font/google";
 import Image from 'next/image';
 
@@ -12,9 +26,11 @@ const baiJamjuree = Bai_Jamjuree({
   variable: "--font-bai-jamjuree",
 });
 
+// --- ✨ UPDATED navLinks array ---
 const navLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/portfolio', label: 'Add Video Project', icon: Video },
+  { href: '/admin/portfolio/manage', label: 'Manage Videos', icon: ListVideo }, // ✨ THIS LINK IS NOW ADDED
   { href: '/admin/photography/projects', label: 'Photo Projects', icon: FolderHeart },
   { href: '/admin/photography/upload', label: 'Upload Photo', icon: UploadCloud },
   { href: '/admin/photography/manage', label: 'Manage Photos', icon: Camera },
@@ -26,7 +42,7 @@ const navLinks = [
   { href: '/admin/category', label: 'Manage Categories', icon: List },
 ];
 
-// --- ✨ NEW: Custom Scrollbar Styles ---
+// --- Custom Scrollbar Styles ---
 const GlobalScrollbarStyles = () => (
   <style jsx global>{`
     .admin-sidebar-scrollbar::-webkit-scrollbar {
@@ -57,7 +73,7 @@ const Sidebar = () => (
        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Admin</h1>
     </div>
     
-    {/* ✨ UPDATED: Added custom scrollbar class */}
+    {/* Added custom scrollbar class */}
     <ul className="space-y-3 overflow-y-auto admin-sidebar-scrollbar pr-2">
       {navLinks.map((link) => {
         const Icon = link.icon;
@@ -65,7 +81,7 @@ const Sidebar = () => (
           <li key={link.href}>
             <Link
               href={link.href}
-              // ✨ UPDATED: Removed all focus:ring-* classes
+              // Removed focus:ring-* classes
               className="flex items-center gap-3 px-4 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-cyan-400 transition-colors duration-200 focus:outline-none focus:bg-neutral-800"
             >
               <Icon size={20} />
@@ -79,7 +95,7 @@ const Sidebar = () => (
     <div className="mt-auto pt-6 border-t border-neutral-800">
       <Link 
         href="/" 
-        // ✨ UPDATED: Removed all focus:ring-* classes
+        // Removed focus:ring-* classes
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors focus:outline-none focus:text-white rounded p-1 -m-1"
       >
         <LayoutDashboard size={16} />

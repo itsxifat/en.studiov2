@@ -28,17 +28,8 @@ const PortfolioItemSchema = new mongoose.Schema({
     trim: true,
     default: null,
   },
-  liveUrl: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  githubUrl: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  isFeatured: { // ✨ NEW FIELD
+  // liveUrl and githubUrl fields have been removed
+  isFeatured: {
     type: Boolean,
     default: false,
   },

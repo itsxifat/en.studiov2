@@ -1,20 +1,15 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Search,
   X,
   SearchX,
-  Link as LinkIcon,
-  Github,
-  PlayCircle,
   ChevronDown,
-  Loader2 as Loader,
+  Loader2,
   Code,
-  ExternalLink,
-  Maximize2,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------------------
@@ -23,7 +18,6 @@ import {
 
 const GlobalScrollbarStyles = () => (
   <style jsx global>{`
-    /* Custom Scrollbar */
     .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30, 30, 35, 0.5); border-radius: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(100, 116, 139, 0.5); border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
@@ -55,11 +49,10 @@ const GlobalScrollbarStyles = () => (
 );
 
 /* ---------------------------------------------------------------------------
-  YouTubeEmbed (Standard Implementation)
+  YouTubeEmbed (Clean - No Controls)
   --------------------------------------------------------------------------- */
-// ✨ --- FIX: Added 'export' AND 'controls=0' + 'modestbranding=1' --- ✨
 export function YouTubeEmbed({ youtubeId, title, autoPlay = false }) {
-  const videoSrc = `https://www.youtube.com/embed/${youtubeId}?${autoPlay ? "autoplay=1&" : ""}rel=0&showinfo=0&iv_load_policy=3&controls=0&modestbranding=1`;
+  const videoSrc = `https://www.youtube.com/embed/${youtubeId}?autoplay=${autoPlay ? 1 : 0}&rel=0&controls=0&modestbranding=1&showinfo=0&fs=1&iv_load_policy=3&disablekb=1`;
   return (
     <iframe
       src={videoSrc}
@@ -81,19 +74,9 @@ const cardVariants = {
   exit: { opacity: 0, y: -20, scale: 0.95, transition: { duration: 0.3 } },
 };
 
-const cardHoverVariant = {
-  rest: { scale: 1, y: 0 },
-  hover: { 
-    scale: 1.02, 
-    y: -8,
-    transition: { type: "spring", stiffness: 400, damping: 20 }
-  },
-};
-
 const imageHoverVariant = {
   rest: { scale: 1 },
-  // ✨ FIX: Reduced hover scale from 1.05 to 1.03 for a more professional feel
-  hover: { scale: 1.03, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
+  hover: { scale: 1.08, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
 export function PortfolioCard({ item, onOpen }) {
@@ -106,19 +89,17 @@ export function PortfolioCard({ item, onOpen }) {
       initial="initial"
       animate="animate"
       exit="exit"
-      whileHover="hover"
-      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-neutral-800/60 bg-gradient-to-br from-neutral-900 to-neutral-950 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/10 transition-shadow duration-300"
+      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-neutral-800/60 bg-gradient-to-br from-neutral-900 to-neutral-950 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300"
       onClick={() => onOpen(item)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen(item)}
       aria-label={`View project: ${item?.title || "Untitled"}`}
     >
-      <motion.div
-        variants={cardHoverVariant}
-        className="relative overflow-hidden aspect-video border-b border-neutral-800/60 bg-neutral-950"
-      >
+      <div className="relative overflow-hidden aspect-video border-b border-neutral-800/60 bg-neutral-950">
         <motion.div
+          initial="rest"
+          whileHover="hover"
           variants={imageHoverVariant}
           className="absolute inset-0"
         >
@@ -132,7 +113,7 @@ export function PortfolioCard({ item, onOpen }) {
         </motion.div>
 
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-neutral-900 via-neutral-900/60 to-transparent pointer-events-none" aria-hidden="true" />
-      </motion.div>
+      </div>
 
       <div className="p-5 flex flex-col grow">
         
@@ -204,7 +185,6 @@ export function Modal({ open, onClose, item }) {
   }, [open, onClose]);
 
   const hasTags = Array.isArray(item?.tags) && item.tags.length > 0;
-  const hasLinks = item?.liveUrl || item?.githubUrl;
   
   if (!item) return null;
 
@@ -281,39 +261,6 @@ export function Modal({ open, onClose, item }) {
                 <h2 id="modal-title" className="text-xl sm:text-2xl lg:text-3xl font-bold font-heading text-neutral-100 leading-tight mb-4">
                   {item?.title || "Untitled Project"}
                 </h2>
-
-                {hasLinks && (
-                  <div className="flex flex-wrap items-center gap-3 mb-6 pb-6 border-b border-neutral-800/50">
-                    {item?.liveUrl && (
-                      <motion.a
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        href={item.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-bold text-white shadow-lg hover:shadow-cyan-500/50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-neutral-900"
-                        aria-label="View live site"
-                      >
-                        <ExternalLink size={16} aria-hidden="true" /> 
-                        <span>Live Site</span>
-                      </motion.a>
-                    )}
-                    {item?.githubUrl && (
-                      <motion.a
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        href={item.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg border-2 border-neutral-600/70 bg-neutral-800/50 backdrop-blur-sm px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-bold text-neutral-200 shadow-lg hover:border-neutral-500 hover:bg-neutral-700/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:ring-offset-neutral-900"
-                        aria-label="View source code on GitHub"
-                      >
-                        <Github size={16} aria-hidden="true" /> 
-                        <span>View Code</span>
-                      </motion.a>
-                    )}
-                  </div>
-                )}
 
                 {item?.description && (
                   <div className="mb-6">
@@ -490,7 +437,7 @@ export function ClientPortfolioPage({
     if (isLoading) {
       return (
         <div className="flex min-h-[50vh] flex-col items-center justify-center text-center py-20">
-          <Loader size={40} className="animate-spin text-cyan-500 mb-4" aria-label="Loading projects" />
+          <Loader2 size={40} className="animate-spin text-cyan-500 mb-4" aria-label="Loading projects" />
           <p className="text-lg text-neutral-400 font-medium">Loading Projects...</p>
           <p className="text-sm text-neutral-500 mt-2">Please wait while we fetch amazing work</p>
         </div>

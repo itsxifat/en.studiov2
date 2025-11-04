@@ -1,64 +1,47 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect'; // Ensure path is correct
-import PortfolioItem from '../../../models/portfolioItem'; // Ensure path is correct
-import { v2 as cloudinary } from 'cloudinary';
-import mongoose from 'mongoose';
+import dbConnect from '../../../lib/dbConnect';
+import PortfolioItem from '../../../models/portfolioItem';
+import PhotoProject from '../../../models/photoProject'; // ✨ 1. Import PhotoProject
 
-// Configure Cloudinary (keep as is)
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
+// Cloudinary is no longer needed here
 
 export async function GET() {
   await dbConnect();
   try {
-    // 1. Fetch Videos from MongoDB (ensure isFeatured is selected)
+    // 1. Fetch Video Projects (Videos)
     const videos = await PortfolioItem.find({})
       .sort({ createdAt: -1 })
-      .select('title thumbnail isFeatured _id createdAt') // isFeatured is selected
+      .select('title thumbnail isFeatured _id createdAt')
       .lean();
 
-    // 2. Fetch Photos from Cloudinary (keep as is)
-    const { resources: cloudinaryPhotos } = await cloudinary.search
-      .expression('folder:portfolio')
-      .sort_by('created_at', 'desc')
-      .with_field('context')
-      .max_results(500)
-      .execute();
+    // ✨ 2. Fetch Photo Projects (NOT individual photos)
+    const photoProjects = await PhotoProject.find({})
+      .sort({ createdAt: -1 })
+      .select('title thumbnail isFeatured _id createdAt slug') // Get the fields we need
+      .lean();
 
-    // 3. Map Cloudinary photos (keep as is)
-    const photos = cloudinaryPhotos.map(file => ({
-        _id: file.public_id,
-        title: file.context?.title || file.filename || 'Untitled Photo',
-        thumbnail: cloudinary.url(file.public_id, {
-            width: 300, height: 200, crop: 'fill', quality: 'auto:good', fetch_format: 'auto'
-        }),
-        isFeatured: file.context?.isFeatured === 'true',
-        createdAt: file.created_at,
-        type: 'photo'
+    // Map Photo Projects to a consistent format
+    const photos = photoProjects.map(project => ({
+      _id: project._id,
+      title: project.title,
+      thumbnail: project.thumbnail,
+      isFeatured: project.isFeatured || false, // Default to false if missing
+      createdAt: project.createdAt,
+      type: 'photoProject' // ✨ 3. Set the type to 'photoProject'
     }));
 
-    // ✨ 4. Map MongoDB videos AND ensure 'isFeatured' defaults to false ✨
+    // Map MongoDB videos to a consistent format
     const formattedVideos = videos.map(video => ({
-      _id: video._id, // Ensure _id is explicitly mapped
-      title: video.title,
-      thumbnail: video.thumbnail,
-      // Default isFeatured to false if it's missing or not a boolean
+      ...video,
       isFeatured: typeof video.isFeatured === 'boolean' ? video.isFeatured : false,
-      createdAt: video.createdAt,
-      type: 'video' // Add the type identifier
+      type: 'video'
     }));
 
-    // 5. Combine video and photo arrays (keep as is)
-    const allItems = [...formattedVideos, ...photos];
+    // 4. Combine and sort
+    const allItems = [...formattedVideos, ...photos].sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
-    // 6. Sort the combined array (keep as is)
-    allItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    // 7. Return the successful response (keep as is)
     return NextResponse.json({ success: true, data: allItems });
 
   } catch (error) {

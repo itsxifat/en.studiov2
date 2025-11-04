@@ -18,15 +18,19 @@ const PhotoProjectSchema = new mongoose.Schema({
     trim: true,
     default: '',
   },
-  thumbnail: { // Public URL from Cloudinary
+  thumbnail: {
     type: String,
     required: [true, 'Please provide a thumbnail URL.'],
   },
-  thumbnailPublicId: { // Cloudinary ID for deletion
+  thumbnailPublicId: {
     type: String,
     required: true,
   },
-  // BTS fields are now removed and will be handled by a separate model
+  // --- ✨ ADD THIS FIELD ✨ ---
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
 }, { timestamps: true });
 
 export default mongoose.models.PhotoProject || mongoose.model('PhotoProject', PhotoProjectSchema);
