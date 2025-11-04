@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, CheckCircle, AlertTriangle, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { Upload, CheckCircle, AlertTriangle, Loader2, Image as ImageIcon, X, Plus } from 'lucide-react';
 import Link from 'next/link';
-
+import Image from "next/image"; // ✨ --- THIS IS THE FIX --- ✨
 
 // Reusable Message component
 const Message = ({ status, message }) => {
@@ -31,8 +31,10 @@ export default function UploadPhotographyPage() {
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  
+  // State updated for multiple files
+  const [files, setFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const fileInputRef = useRef(null);
 
   // --- New state for projects ---
@@ -64,48 +66,73 @@ export default function UploadPhotographyPage() {
     fetchProjects();
   }, []);
   
-  // --- End new state logic ---
-
+  // Handle multiple files and 10MB limit
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.size > 20 * 1024 * 1024) { // 20MB limit
-        setStatus('error');
-        setMessage('File is too large (Max 20MB).');
-        setFile(null);
-        setPreview(null);
-        return;
-      }
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
-      setStatus(null); setMessage('');
-    }
-  };
+    const selectedFiles = Array.from(e.target.files);
+    if (!selectedFiles.length) return;
 
-  const clearFile = () => {
-    setFile(null);
-    setPreview(null);
+    let validFiles = [];
+    let newPreviews = [];
+    let errorFound = false;
+    const tenMB = 10 * 1024 * 1024; // 10MB limit
+
+    for (const file of selectedFiles) {
+      if (file.size > tenMB) {
+        setStatus('error');
+        setMessage(`File "${file.name}" is too large (Max 10MB).`);
+        errorFound = true;
+      } else {
+        validFiles.push(file);
+        newPreviews.push(URL.createObjectURL(file));
+      }
+    }
+    
+    setFiles(prev => [...prev, ...validFiles]);
+    setPreviews(prev => [...prev, ...newPreviews]);
+    
+    if (!errorFound) {
+      setStatus(null);
+      setMessage('');
+    }
+    
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // Function to remove a specific file by its index
+  const removeFile = (indexToRemove) => {
+    URL.revokeObjectURL(previews[indexToRemove]);
+    setFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setPreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  // Clear all files and previews
+  const clearFiles = () => {
+    previews.forEach(url => URL.revokeObjectURL(url));
+    setFiles([]);
+    setPreviews([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // Handle submit for multiple files
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting || !file || !selectedProject) {
+    if (isSubmitting || files.length === 0 || !selectedProject) {
       setStatus('error');
-      setMessage('Please select a project and a file to upload.');
+      setMessage('Please select a project and at least one file to upload.');
       return;
     }
 
     setIsSubmitting(true);
     setStatus('loading');
-    setMessage('Uploading photo to Cloudinary...');
+    setMessage(`Uploading ${files.length} photo(s)...`);
 
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('projectId', selectedProject); // Add project ID
-    formData.append('title', e.target.title.value);
-    formData.append('description', e.target.description.value);
-
+    formData.append('projectId', selectedProject);
+    
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+    
     try {
       const res = await fetch('/api/admin/photography/upload', {
         method: 'POST',
@@ -115,9 +142,8 @@ export default function UploadPhotographyPage() {
 
       if (res.ok && data.success) {
         setStatus('success');
-        setMessage('Photo uploaded and linked to project!');
-        e.target.reset(); // Clear text fields
-        clearFile(); // Clear file input
+        setMessage(`${data.count} photo(s) uploaded and linked!`);
+        clearFiles();
       } else {
         throw new Error(data.error || 'Upload failed.');
       }
@@ -133,7 +159,7 @@ export default function UploadPhotographyPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 font-heading uppercase text-cyan-400">
-        Upload Project Photo
+        Upload Project Photo(s)
       </h1>
 
       <AnimatePresence>{status && <Message status={status} message={message} key="message" />}</AnimatePresence>
@@ -161,60 +187,74 @@ export default function UploadPhotographyPage() {
               ))}
             </select>
             {projects.length === 0 && !isLoadingProjects && (
-                 <p className="text-xs mt-1 text-yellow-400">
-                    No projects found. Please <Link href="/admin/photography/projects" className="underline hover:text-cyan-400">create a project</Link> first.
-                 </p>
+               <p className="text-xs mt-1 text-yellow-400">
+                  No projects found. Please <Link href="/admin/photography/projects" className="underline hover:text-cyan-400">create a project</Link> first.
+               </p>
             )}
           </div>
 
-          {/* File Upload Area */}
+          {/* --- File Upload Area for Multiple Files --- */}
           <div>
-            <label className="block text-sm font-semibold mb-2 text-neutral-300">Photo *</label>
-            {/* ... (File upload JSX - no changes) ... */}
+            <label className="block text-sm font-semibold mb-2 text-neutral-300">Photos *</label>
+            
+            {/* --- Preview Grid --- */}
+            {previews.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4">
+                {previews.map((previewUrl, index) => (
+                  <div key={index} className="relative aspect-square">
+                    <Image 
+                      src={previewUrl} 
+                      alt={`Preview ${index + 1}`} 
+                      fill 
+                      sizes="20vw"
+                      className="object-cover w-full h-full rounded-md" 
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeFile(index); }}
+                      className="absolute -top-2 -right-2 p-1 bg-red-600 rounded-full text-white hover:bg-red-500 transition-colors"
+                      aria-label="Remove image"
+                    >
+                      <X size={14} strokeWidth={3} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* --- Upload Dropzone / Button --- */}
             <div 
-              className={`flex justify-center items-center w-full h-64 px-6 pt-5 pb-6 border-2 border-neutral-700 border-dashed rounded-lg cursor-pointer hover:border-cyan-500 transition-colors ${preview ? 'p-0' : ''}`}
+              className={`flex justify-center items-center w-full px-6 py-10 border-2 border-neutral-700 border-dashed rounded-lg cursor-pointer hover:border-cyan-500 transition-colors`}
               onClick={() => fileInputRef.current?.click()}
             >
-              {preview ? (
-                <div className="relative w-full h-full">
-                  <img src={preview} alt="Preview" className="object-contain w-full h-full rounded-md" />
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); clearFile(); }}
-                    className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-full text-white hover:bg-red-600 transition-colors"
-                    aria-label="Remove image"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-1 text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-neutral-500" />
-                  <p className="text-sm text-neutral-400"><span className="font-semibold text-cyan-400">Click to upload</span> or drag and drop</p>
-                  <p className="text-xs text-neutral-500">PNG, JPG, WebP up to 20MB</p>
-                </div>
-              )}
+              <div className="space-y-1 text-center">
+                <ImageIcon className="mx-auto h-12 w-12 text-neutral-500" />
+                <p className="text-sm text-neutral-400"><span className="font-semibold text-cyan-400">Click to upload</span> or drag and drop</p>
+                <p className="text-xs text-neutral-500">
+                  {previews.length > 0 ? `Added ${previews.length} file(s). Click to add more.` : `PNG, JPG, WebP (Max 10MB each)`}
+                </p>
+              </div>
             </div>
+
             <input
               id="file-upload" name="file-upload" type="file" className="sr-only"
               ref={fileInputRef} onChange={handleFileChange}
               accept="image/png, image/jpeg, image/gif, image/webp"
               disabled={isSubmitting}
+              multiple
             />
           </div>
 
-          {/* Title & Description (Optional) */}
-          <input name="title" type="text" disabled={isSubmitting} className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" placeholder="Photo Title (Optional)" />
-          <textarea name="description" rows={3} disabled={isSubmitting} className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500" placeholder="Photo Description (Optional)" />
+          {/* --- Title & Description fields are REMOVED --- */}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || !file || !selectedProject || isLoadingProjects}
+            disabled={isSubmitting || files.length === 0 || !selectedProject || isLoadingProjects}
             className="w-full inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-5 py-3 rounded-lg transition-colors disabled:bg-neutral-700 disabled:cursor-not-allowed"
           >
             {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} className="mr-2" />}
-            Upload Photo
+            Upload {files.length > 0 ? `${files.length} Photo(s)` : 'Photo(s)'}
           </button>
         </form>
       </div>
