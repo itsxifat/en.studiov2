@@ -1,7 +1,23 @@
 "use client";
 import React from "react";
-import Link from 'next/link'; // Import Link
-import Image from 'next/image'; // Import Image
+import Link from 'next/link';
+import Image from 'next/image';
+
+// ✨ NEW: Helper function for smooth scrolling
+const handleScroll = (e, id) => {
+  e.preventDefault();
+  // Get "work" from "/#work"
+  const targetId = id.split('#')[1];
+  if (!targetId) return;
+
+  const element = document.getElementById(targetId);
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+};
 
 const Footer = () => {
   return (
@@ -25,20 +41,35 @@ const Footer = () => {
             />
           </Link>
 
-          {/* Navigation Links */}
+          {/* ✨ UPDATED: Navigation Links now use <Link> and handleScroll */}
           <div className="flex gap-8 font-body">
-            <a href="#work" className="hover:text-white transition-colors">
+            <Link 
+              href="/#work" 
+              onClick={(e) => handleScroll(e, "/#work")} 
+              className="hover:text-white transition-colors"
+            >
               Work
-            </a>
-            <a href="#services" className="hover:text-white transition-colors">
+            </Link>
+            <Link 
+              href="/#services" 
+              onClick={(e) => handleScroll(e, "/#services")} 
+              className="hover:text-white transition-colors"
+            >
               Services
-            </a>
-            <a href="#about" className="hover:text-white transition-colors">
+            </Link>
+            <Link 
+              href="/about" 
+              className="hover:text-white transition-colors"
+            >
               About
-            </a>
-            <a href="#contact" className="hover:text-white transition-colors">
+            </Link>
+            <Link 
+              href="/#contact" 
+              onClick={(e) => handleScroll(e, "/#contact")} 
+              className="hover:text-white transition-colors"
+            >
               Contact
-            </a>
+            </Link>
           </div>
         </div>
 

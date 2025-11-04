@@ -7,9 +7,9 @@ import { ArrowLeft, Video, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { ClientPortfolioPage } from './_clientComponents';
-import { PhotographyGallery } from './_photographyGallery'; // New Component
+import { PhotographyGallery } from './_photographyGallery';
 
-// Your existing PortfolioHeader (Unchanged except image fix)
+// PortfolioHeader (No changes)
 const PortfolioHeader = () => {
   const router = useRouter();
 
@@ -17,7 +17,7 @@ const PortfolioHeader = () => {
     <header className="relative overflow-hidden border-b border-neutral-800/50 bg-gradient-to-b from-neutral-950 via-neutral-950 to-black">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 bg-grid-neutral-700/[0.03]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
 
       {/* Back Button */}
       <motion.button
@@ -73,7 +73,7 @@ const PortfolioHeader = () => {
   );
 };
 
-// NEW: Tab Selector Component
+// --- ✨ UPDATED Tab Selector Component ✨ ---
 const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'video', label: 'Video Production', icon: Video },
@@ -81,17 +81,21 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <nav className="flex justify-center p-4 border-b border-neutral-800/50 bg-black/50 backdrop-blur-sm sticky top-0 z-40">
-      <div className="flex space-x-3 p-1.5 rounded-xl bg-neutral-900/70 border border-neutral-700/50">
+    // ✨ FIX: Removed sticky, z-40, backdrop-blur, and bg-black/50.
+    // ✨ FIX: Changed p-4 to py-6 for simple spacing.
+    <nav className="flex justify-center py-6 bg-transparent">
+      {/* ✨ FIX: Reduced padding from p-1.5 to p-1 */}
+      <div className="flex space-x-2 p-1 rounded-xl bg-neutral-900/70">
         {tabs.map((tab) => (
           <motion.button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`relative flex-shrink-0 whitespace-nowrap rounded-lg px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-bold tracking-wide transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500/80 focus:ring-offset-2 focus:ring-offset-black/90 flex items-center gap-2.5 ${
+            // ✨ FIX: Reduced padding for a smaller height
+            className={`relative shrink-0 whitespace-nowrap rounded-lg px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-bold tracking-wide transition-all duration-200 ease-in-out focus:outline-none flex items-center gap-2.5 ${
               activeTab === tab.id
-                ? "text-white shadow-lg shadow-cyan-500/30"
+                ? "text-white"
                 : "text-neutral-400 hover:text-neutral-100"
             }`}
             aria-pressed={activeTab === tab.id}
@@ -112,7 +116,7 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   );
 };
 
-// NEW: Wrapper for your original Video/Web portfolio content
+// Wrapper for your original Video/Web portfolio content (No Changes)
 const VideoPortfolio = () => {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -166,7 +170,7 @@ const VideoPortfolio = () => {
 }
 
 
-// UPDATED: Main Page Component
+// Main Page Component (No Changes)
 export default function PortfolioPage() {
   const [activeTab, setActiveTab] = useState('video'); // 'video' or 'photography'
 
@@ -176,7 +180,6 @@ export default function PortfolioPage() {
 
       <PortfolioTabSelector activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Conditional Content Rendering */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
@@ -193,7 +196,6 @@ export default function PortfolioPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Compact Footer (Unchanged) */}
       <footer className="border-t border-neutral-800/50 mt-16 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-6 text-center">
           <p className="text-sm text-neutral-500">

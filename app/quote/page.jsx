@@ -1,175 +1,312 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import * as THREE from "three";
-import { gsap } from "gsap";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, CheckCircle, AlertTriangle, MessageSquare, Send, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter for the back button
 
-const FLAG_QUOTE = "quote_plane_from_main";
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+// --- Reusable Button Components (Styles Swapped) ---
 
-function ensureOverlay(id="quote-overlay"){
-  let canvas = document.getElementById(id);
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    canvas.id = id;
-    Object.assign(canvas.style, { position:"fixed", inset:0, zIndex:10005, pointerEvents:"none", background:"transparent" });
-    document.body.appendChild(canvas);
-  }
-  return canvas;
-}
-
-function makePaperPlane() {
-  const group = new THREE.Group();
-  const body = new THREE.Mesh(
-    new THREE.ConeGeometry(0.06, 0.9, 3, 1, false),
-    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, metalness: 0.05 })
+// PRIMARY Button: WhatsApp (Highlighted)
+const WhatsAppButton = ({ label, number }) => {
+  if (!number) return null;
+  const href = `https://wa.me/${number}`;
+  
+  return (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center justify-center gap-2 px-6 py-3 h-12 w-full sm:w-auto
+                 bg-white text-black font-semibold rounded-lg
+                 transition-colors duration-300 ease-out
+                 hover:bg-neutral-200
+                 active:scale-95
+                 focus:outline-none focus-visible:ring-2 focus-visible:ring-white 
+                 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+      aria-label={label}
+    >
+      <MessageSquare size={18} />
+      <span className="relative z-10">{label}</span>
+    </Link>
   );
-  body.rotation.z = Math.PI;
-  body.position.y = 0.2;
+};
 
-  const wingMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0.05 });
-  const wingGeo = new THREE.PlaneGeometry(0.7, 0.35);
-  const leftWing = new THREE.Mesh(wingGeo, wingMat);
-  leftWing.rotation.x = -Math.PI/2; leftWing.rotation.z = 0.15; leftWing.position.set(-0.18,0.05,0);
-  const rightWing = new THREE.Mesh(wingGeo, wingMat.clone());
-  rightWing.rotation.x = -Math.PI/2; rightWing.rotation.z = -0.15; rightWing.position.set(0.18,0.05,0);
+// SECONDARY Button: Email Form Submit
+const EmailSubmitButton = ({ label, isLoading }) => {
+  return (
+    <button 
+      type="submit"
+      disabled={isLoading}
+      className="inline-flex items-center justify-center gap-2 px-6 py-3 h-12 w-full sm:w-auto
+                 bg-neutral-800/50 text-neutral-300 font-semibold rounded-lg
+                 border border-neutral-700/50
+                 transition-all duration-300 ease-out
+                 hover:bg-neutral-700/80 hover:text-white
+                 active:scale-95
+                 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-600 
+                 focus-visible:ring-offset-2 focus-visible:ring-offset-black
+                 disabled:bg-neutral-800 disabled:text-neutral-500 disabled:cursor-not-allowed"
+      aria-label={label}
+    >
+      {isLoading ? (
+        <Loader2 size={20} className="animate-spin" />
+      ) : (
+        <>
+          <Send size={16} />
+          <span className="relative z-10">{label}</span>
+        </>
+      )}
+    </button>
+  );
+};
 
-  const tailGeo = new THREE.PlaneGeometry(0.25, 0.18);
-  const tailL = new THREE.Mesh(tailGeo, wingMat.clone()); tailL.rotation.x = -Math.PI/2; tailL.rotation.z = 0.2; tailL.position.set(-0.12, 0.05, -0.3);
-  const tailR = new THREE.Mesh(tailGeo, wingMat.clone()); tailR.rotation.x = -Math.PI/2; tailR.rotation.z = -0.2; tailR.position.set(0.12, 0.05, -0.3);
-
-  group.add(body, leftWing, rightWing, tailL, tailR);
-  group.userData = { body, leftWing, rightWing, tailL, tailR };
-  return group;
-}
-
-async function runLandingUnfold(onDone) {
-  const canvas = ensureOverlay();
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 2000);
-  camera.position.set(0, 0, 8);
-
-  const amb = new THREE.AmbientLight(0xffffff, 1.0);
-  const dir = new THREE.DirectionalLight(0xffffff, 1.2); dir.position.set(4,6,8);
-  scene.add(amb, dir);
-
-  const plane = makePaperPlane(); scene.add(plane);
-  plane.position.set(0.6, 2.2, 0); plane.rotation.set(-0.1, -0.1, 0.25);
-
-  // a simple "ground" white sheet (will grow & become the quote stage)
-  const sheetMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.0 });
-  const sheet = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.7, 1, 1), sheetMat);
-  sheet.rotation.x = -Math.PI/2;
-  sheet.position.set(0, -0.05, -0.1);
-  sheet.scale.set(0.001, 0.001, 0.001); // start hidden
-  scene.add(sheet);
-
-  const onResize = () => {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
+// Form Status Message
+const FormMessage = ({ status, message }) => {
+  if (!status) return null;
+  const style = {
+    success: 'bg-green-800/50 border-green-700 text-green-200',
+    error: 'bg-red-800/50 border-red-700 text-red-200',
   };
-  window.addEventListener("resize", onResize);
+  const Icon = status === 'success' ? CheckCircle : AlertTriangle;
+  return (
+    // This animation is clean and professional
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }} // Snappier spring
+      className={`flex items-start gap-3 p-4 rounded-lg border ${style[status]} mb-6`}
+    >
+      <Icon size={20} className="flex-shrink-0 mt-0.5" />
+      <p className="font-semibold text-sm">{message}</p>
+    </motion.div>
+  );
+};
 
-  let raf=0, t=0; const clock=new THREE.Clock();
-  const render=()=>{ const dt=clamp(clock.getDelta(),0,0.05); t+=dt;
-    const { leftWing, rightWing, tailL, tailR } = plane.userData;
-    // gentle flutter while landing
-    leftWing.rotation.z = 0.15 + Math.sin(t*5.0)*0.03;
-    rightWing.rotation.z = -0.15 - Math.sin(t*5.1)*0.03;
-    tailL.rotation.z = 0.2 + Math.sin(t*6.2)*0.02;
-    tailR.rotation.z = -0.2 - Math.sin(t*6.0)*0.02;
-    renderer.render(scene, camera); raf=requestAnimationFrame(render);
-  };
-  render();
+// --- Animation Variants for Page Load ---
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // Stagger effect
+      delayChildren: 0.1,
+    },
+  },
+};
 
-  // LANDING → UNFOLD → SHEET EXPANDS
-  const tl = gsap.timeline({
-    defaults: { ease: "power2.out" },
-    onComplete: () => {
-      cancelAnimationFrame(raf);
-      try { renderer.dispose(); canvas.remove(); } catch {}
-      onDone?.();
-    }
-  });
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1], // Professional ease
+    },
+  },
+};
 
-  // cinematic descend + slight bank
-  tl.to(plane.position, { x: 0, y: 0.15, z: 0, duration: 1.6, ease: "power3.in" }, 0)
-    .to(plane.rotation, { x: 0.05, y: 0.05, z: 0.0, duration: 1.6 }, 0)
-    .to(plane.position, { y: 0.0, duration: 0.5, ease: "sine.out" }) // gentle touch
-    .to(plane.rotation, { x: 0, y: 0, z: 0, duration: 0.5, ease: "sine.out" }, "<");
 
-  // unfold: rotate wings and tails flat, shrink body, reveal underlying sheet
-  tl.to(plane.userData.leftWing.rotation,  { z: 0, duration: 0.5 }, ">")
-    .to(plane.userData.rightWing.rotation, { z: 0, duration: 0.5 }, "<")
-    .to(plane.userData.tailL.rotation,     { z: 0, duration: 0.45 }, "<+0.05")
-    .to(plane.userData.tailR.rotation,     { z: 0, duration: 0.45 }, "<")
-    .to(plane.userData.body.scale,         { x: 0.001, y: 1, z: 1, duration: 0.45, ease: "power1.inOut" }, "<")
-    .to(sheet.scale,                       { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" }, "<+0.05")
-    .to(plane.scale,                       { x: 0.001, y: 0.001, z: 0.001, duration: 0.4, ease: "power2.in" }, "<+0.1");
-
-  // expand sheet to viewport-ish, then finish
-  tl.to(sheet.scale, { x: 7, y: 1, z: 5, duration: 0.6, ease: "power3.out" }, ">-0.1");
-}
-
+// --- Main Quote Page Component ---
 export default function QuotePage() {
-  const contentRef = useRef(null);
+  const router = useRouter(); // For the back button
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    whatsapp: '',
+    details: '',
+  });
+  const [status, setStatus] = useState(null);
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const shouldAnim = typeof window !== "undefined" && sessionStorage.getItem(FLAG_QUOTE) === "1";
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || null;
 
-    if (!shouldAnim) {
-      // direct hit → show content
-      if (contentRef.current) {
-        gsap.set(contentRef.current, { opacity: 1, y: 0 });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatus(null);
+    setMessage('');
+
+    try {
+      const res = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setStatus('success');
+        setMessage(data.message || 'Your quote request has been sent!');
+        setFormData({ name: '', email: '', phone: '', whatsapp: '', details: '' }); // Clear form
+      } else {
+        throw new Error(data.error || 'An unknown error occurred.');
       }
-      return;
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    // consume flag, run once
-    sessionStorage.removeItem(FLAG_QUOTE);
-
-    runLandingUnfold(() => {
-      if (contentRef.current) {
-        gsap.fromTo(contentRef.current, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
-      }
-    });
-  }, []);
+  };
 
   return (
-    <main className="min-h-[100svh] bg-black text-white">
-      <div ref={contentRef} className="opacity-0">
-        {/* The “paper” becomes the stage; layout sits on top */}
-        <section className="max-w-3xl mx-auto px-6 py-16">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Request a Quote</h1>
-          <p className="mt-4 text-neutral-300">
-            Tell us about your project—timeline, goals, budget—and we’ll craft a custom proposal.
-          </p>
+    <main className="min-h-svh bg-black text-white">
+      
+      {/* --- ✨ NEW: Back Button (like packages page) ✨ --- */}
+      <motion.button
+        onClick={() => router.back()}
+        whileHover={{ scale: 1.1, x: -2 }}
+        whileTap={{ scale: 0.95 }}
+        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all 
+                   hover:bg-neutral-800/80 hover:text-white 
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 
+                   focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        aria-label="Go back"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <ArrowLeft size={20} strokeWidth={2.5} />
+      </motion.button>
+      
+      {/* Main content section with responsive padding */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 pt-32 pb-24 sm:pt-40 sm:pb-32">
+        
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Header */}
+          <motion.div variants={itemVariants}>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight font-heading uppercase text-center">
+              Let's create.
+            </h1>
+            <p className="mt-4 text-lg text-neutral-300 font-body text-center">
+              Get in touch instantly via WhatsApp or fill out the form below.
+              We&apos;ll get back to you within one business day.
+            </p>
+          </motion.div>
+          
+          {/* PRIMARY ACTION: WHATSAPP */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-10 flex justify-center" // Centered
+          >
+            <WhatsAppButton label="Start on WhatsApp" number={whatsappNumber} />
+          </motion.div>
 
-          {/* your form / content here */}
-          <form className="mt-8 space-y-4">
-            <div>
-              <label className="block text-sm mb-2">Name</label>
-              <input className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 outline-none focus:border-cyan-400" />
+          {/* "OR" DIVIDER */}
+          <motion.div 
+            variants={itemVariants}
+            className="flex items-center gap-4 my-10"
+          >
+            <div className="h-px flex-grow bg-neutral-800"></div>
+            <span className="text-neutral-500 text-sm font-semibold">OR</span>
+            <div className="h-px flex-grow bg-neutral-800"></div>
+          </motion.div>
+
+          {/* SECONDARY ACTION: EMAIL FORM */}
+          <motion.form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            variants={itemVariants}
+          >
+            <h2 className="text-2xl font-semibold font-heading text-neutral-200 text-center sm:text-left">
+              Send an Email Request
+            </h2>
+
+            <AnimatePresence>
+              {message && <FormMessage status={status} message={message} />}
+            </AnimatePresence>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold mb-2 text-neutral-300">Name *</label>
+                <input 
+                  type="text" name="name" id="name"
+                  value={formData.name} onChange={handleInputChange}
+                  required 
+                  className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
+                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold mb-2 text-neutral-300">Email *</label>
+                <input 
+                  type="email" name="email" id="email"
+                  value={formData.email} onChange={handleInputChange}
+                  required 
+                  className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
+                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm mb-2">Email</label>
-              <input type="email" className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 outline-none focus:border-cyan-400" />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-neutral-300">Primary Phone *</label>
+                <input 
+                  type="tel" name="phone" id="phone"
+                  value={formData.phone} onChange={handleInputChange}
+                  required
+                  className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
+                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label htmlFor="whatsapp" className="block text-sm font-semibold mb-2 text-neutral-300">WhatsApp Number *</label>
+                <input 
+                  type="tel" name="whatsapp" id="whatsapp"
+                  value={formData.whatsapp} onChange={handleInputChange}
+                  required
+                  className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
+                             focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                             transition-colors disabled:opacity-50"
+                  disabled={isLoading}
+                />
+              </div>
             </div>
+
             <div>
-              <label className="block text-sm mb-2">Project Details</label>
-              <textarea rows={5} className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 outline-none focus:border-cyan-400" />
+              <label htmlFor="details" className="block text-sm font-semibold mb-2 text-neutral-300">Project Details *</label>
+              <textarea 
+                rows={6} name="details" id="details"
+                value={formData.details} onChange={handleInputChange}
+                required
+                className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-4 py-3 text-white outline-none 
+                           focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 
+                           transition-colors disabled:opacity-50" 
+                placeholder="What are you looking to create? What is your timeline?"
+                disabled={isLoading}
+              />
             </div>
-            <button className="mt-2 inline-flex items-center justify-center rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-5 py-2">
-              Submit
-            </button>
-          </form>
-        </section>
-      </div>
+            
+            <div className="pt-4">
+              <EmailSubmitButton label="Send Email Request" isLoading={isLoading} />
+            </div>
+
+          </motion.form>
+        </motion.div>
+      </section>
     </main>
   );
 }

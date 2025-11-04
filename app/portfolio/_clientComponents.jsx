@@ -1,4 +1,3 @@
-// app/portfolio/_clientComponents.jsx
 "use client";
 
 import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
@@ -45,7 +44,6 @@ const GlobalScrollbarStyles = () => (
       animation: gradient-flow 6s ease infinite;
     }
 
-    /* Pulse animation for play button */
     @keyframes pulse-ring {
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.5); opacity: 0; }
@@ -59,8 +57,9 @@ const GlobalScrollbarStyles = () => (
 /* ---------------------------------------------------------------------------
   YouTubeEmbed (Standard Implementation)
   --------------------------------------------------------------------------- */
-function YouTubeEmbed({ youtubeId, title, autoPlay = false }) {
-  const videoSrc = `https://www.youtube.com/embed/${youtubeId}?${autoPlay ? "autoplay=1&" : ""}rel=0&showinfo=0&iv_load_policy=3`;
+// ✨ --- FIX: Added 'export' AND 'controls=0' + 'modestbranding=1' --- ✨
+export function YouTubeEmbed({ youtubeId, title, autoPlay = false }) {
+  const videoSrc = `https://www.youtube.com/embed/${youtubeId}?${autoPlay ? "autoplay=1&" : ""}rel=0&showinfo=0&iv_load_policy=3&controls=0&modestbranding=1`;
   return (
     <iframe
       src={videoSrc}
@@ -74,7 +73,7 @@ function YouTubeEmbed({ youtubeId, title, autoPlay = false }) {
 }
 
 /* ──────────────────────
-  Enhanced Portfolio Card with Crystal Clear Thumbnails
+  Enhanced Portfolio Card
   ────────────────────── */
 const cardVariants = {
   initial: { opacity: 0, y: 30, scale: 0.98 },
@@ -93,7 +92,8 @@ const cardHoverVariant = {
 
 const imageHoverVariant = {
   rest: { scale: 1 },
-  hover: { scale: 1.05, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
+  // ✨ FIX: Reduced hover scale from 1.05 to 1.03 for a more professional feel
+  hover: { scale: 1.03, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
 export function PortfolioCard({ item, onOpen }) {
@@ -114,10 +114,9 @@ export function PortfolioCard({ item, onOpen }) {
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen(item)}
       aria-label={`View project: ${item?.title || "Untitled"}`}
     >
-      {/* Crystal Clear Image Container - No Play Icon */}
       <motion.div
         variants={cardHoverVariant}
-        className="relative overflow-hidden aspect-[16/9] border-b border-neutral-800/60 bg-neutral-950"
+        className="relative overflow-hidden aspect-video border-b border-neutral-800/60 bg-neutral-950"
       >
         <motion.div
           variants={imageHoverVariant}
@@ -132,28 +131,25 @@ export function PortfolioCard({ item, onOpen }) {
           />
         </motion.div>
 
-        {/* Category Badge - Positioned on image */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-neutral-900 via-neutral-900/60 to-transparent pointer-events-none" aria-hidden="true" />
+      </motion.div>
+
+      <div className="p-5 flex flex-col grow">
+        
+        <div className="mb-2">
           <span className="rounded-lg bg-black/80 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 border border-cyan-500/30 shadow-lg">
             {item?.category || "General"}
           </span>
         </div>
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-neutral-900 via-neutral-900/60 to-transparent pointer-events-none" aria-hidden="true" />
-      </motion.div>
-
-      {/* Content Section */}
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold font-heading text-neutral-100 line-clamp-2 leading-tight mb-2 group-hover:text-cyan-400 transition-colors duration-200">
+        <h3 className="text-lg font-bold font-heading text-neutral-100 line-clamp-2 leading-tight group-hover:text-cyan-400 transition-colors duration-200">
           {item?.title || "Untitled Project"}
         </h3>
-
-        <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed mb-4 flex-grow">
+        
+        <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed mt-2 mb-4 grow">
           {item?.description || "No description provided."}
         </p>
 
-        {/* Tags Section */}
         {hasTags && (
           <div className="mb-4">
             <div className="flex flex-wrap gap-2">
@@ -174,7 +170,6 @@ export function PortfolioCard({ item, onOpen }) {
           </div>
         )}
         
-        {/* View Details Button */}
         <div className="mt-auto pt-3 border-t border-neutral-800/50">
           <div className="flex items-center justify-between text-cyan-400 text-sm font-medium">
             <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -191,7 +186,7 @@ export function PortfolioCard({ item, onOpen }) {
 }
 
 /* ──────────────────────
-  Enhanced Modal with YouTube-style Layout
+  Enhanced Modal
   ────────────────────── */
 export function Modal({ open, onClose, item }) {
   useEffect(() => {
@@ -235,10 +230,9 @@ export function Modal({ open, onClose, item }) {
             initial={{ scale: 0.9, opacity: 0, y: 50 }}
             animate={{ scale: 1, opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30, mass: 0.8 } }}
             exit={{ scale: 0.95, opacity: 0, y: 30, transition: { duration: 0.2, ease: "easeIn" } }}
-            className="relative w-full max-w-6xl overflow-hidden rounded-2xl border border-neutral-700/50 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 shadow-2xl flex flex-col max-h-[95vh]"
+            className="relative w-full max-w-6xl overflow-hidden rounded-2xl border border-neutral-700/50 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 shadow-2xl flex flex-col lg:grid lg:grid-cols-5 max-h-[95vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
             <motion.button
               onClick={onClose}
               whileHover={{ scale: 1.1, rotate: 90 }}
@@ -249,8 +243,10 @@ export function Modal({ open, onClose, item }) {
               <X size={20} strokeWidth={2.5} />
             </motion.button>
 
-            {/* Video Container */}
-            <div className="relative w-full bg-black flex-shrink-0 shadow-2xl" style={{ aspectRatio: '16/9' }}>
+            <div 
+              className="relative w-full lg:col-span-3 bg-black shadow-2xl shrink-0" 
+              style={{ aspectRatio: '16/9' }}
+            >
               {item?.youtubeId ? (
                 <YouTubeEmbed youtubeId={item.youtubeId} title={item.title} autoPlay={true} />
               ) : item?.thumbnail ? (
@@ -272,11 +268,9 @@ export function Modal({ open, onClose, item }) {
               )}
             </div>
 
-            {/* YouTube-style Details Section Below Video */}
-            <div className="overflow-y-auto flex-grow custom-scrollbar bg-gradient-to-b from-neutral-900 to-neutral-950">
+            <div className="overflow-y-auto grow lg:col-span-2 custom-scrollbar bg-gradient-to-b from-neutral-900 to-neutral-950">
               <div className="p-4 sm:p-6 lg:p-8">
                 
-                {/* Category Badge */}
                 <div className="mb-3">
                   <span className="inline-flex items-center gap-2 rounded-lg bg-cyan-900/40 border border-cyan-700/50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-cyan-300 shadow-sm">
                     <Code size={12} />
@@ -284,12 +278,10 @@ export function Modal({ open, onClose, item }) {
                   </span>
                 </div>
 
-                {/* Title */}
                 <h2 id="modal-title" className="text-xl sm:text-2xl lg:text-3xl font-bold font-heading text-neutral-100 leading-tight mb-4">
                   {item?.title || "Untitled Project"}
                 </h2>
 
-                {/* Action Buttons - Responsive Layout */}
                 {hasLinks && (
                   <div className="flex flex-wrap items-center gap-3 mb-6 pb-6 border-b border-neutral-800/50">
                     {item?.liveUrl && (
@@ -323,7 +315,6 @@ export function Modal({ open, onClose, item }) {
                   </div>
                 )}
 
-                {/* Description */}
                 {item?.description && (
                   <div className="mb-6">
                     <p id="modal-description" className="text-neutral-300 text-sm sm:text-base leading-relaxed whitespace-pre-line">
@@ -332,7 +323,6 @@ export function Modal({ open, onClose, item }) {
                   </div>
                 )}
 
-                {/* Technologies Section */}
                 {hasTags && (
                   <div className="pt-6 border-t border-neutral-800/50">
                     <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 flex items-center gap-2">
@@ -364,7 +354,7 @@ export function Modal({ open, onClose, item }) {
 }
 
 /* ──────────────────────
-  Toolbar Component (Unchanged but styled better)
+  Toolbar Component
   ────────────────────── */
 export function Toolbar({ filter, setFilter, q, setQ, sort, setSort, categories }) {
   const categoryList = useMemo(() => {
@@ -376,7 +366,7 @@ export function Toolbar({ filter, setFilter, q, setQ, sort, setSort, categories 
   const handleFilterClick = (category) => setFilter(category);
 
   return (
-    <div className="sticky top-0 z-40 border-b border-neutral-800/50 bg-black/90 backdrop-blur-xl shadow-lg">
+    <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl shadow-lg">
       <div className="mx-auto flex max-w-6xl flex-col gap-3.5 px-4 py-3 sm:flex-row sm:items-center sm:gap-5 sm:py-3">
         <nav className="flex items-center gap-2 overflow-x-auto pb-1.5 sm:pb-0 sm:flex-1 custom-scrollbar-thin" aria-label="Filter portfolio categories">
           {categoryList.map((c) => (
@@ -385,10 +375,10 @@ export function Toolbar({ filter, setFilter, q, setQ, sort, setSort, categories 
               onClick={() => handleFilterClick(c)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`relative flex-shrink-0 whitespace-nowrap rounded-lg border px-4 py-2 text-xs sm:text-sm font-semibold tracking-wide transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500/80 focus:ring-offset-2 focus:ring-offset-black/90 ${
+              className={`relative shrink-0 whitespace-nowrap rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold tracking-wide transition-all duration-200 ease-in-out focus:outline-none ${
                 filter === c
-                  ? "border-transparent text-white shadow-lg shadow-cyan-500/30"
-                  : "border-neutral-700/80 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/60 hover:text-neutral-100"
+                  ? "text-white"
+                  : "text-neutral-400 hover:bg-neutral-800/60 hover:text-neutral-100"
               }`}
               aria-pressed={filter === c}
             >
@@ -459,9 +449,7 @@ export function ClientPortfolioPage({
 
   const items = useMemo(() => {
     let arr = Array.isArray(initialItems) ? [...initialItems] : [];
-
     if (filter !== "All") arr = arr.filter((d) => (d?.category || "") === filter);
-
     const query = q.trim().toLowerCase();
     if (query) {
       arr = arr.filter(
@@ -471,7 +459,6 @@ export function ClientPortfolioPage({
           (Array.isArray(d?.tags) && d.tags.some(tag => tag.toLowerCase().includes(query)))
       );
     }
-
     if (sort === "title") {
       arr.sort((a, b) => (a?.title || "").localeCompare(b?.title || ""));
     } else if (sort === "category") {
@@ -479,7 +466,6 @@ export function ClientPortfolioPage({
     } else {
       arr.sort((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
     }
-
     return arr;
   }, [initialItems, filter, q, sort]);
 

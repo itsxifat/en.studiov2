@@ -4,12 +4,33 @@ import { gsap } from "gsap";
 import Link from "next/link";
 import Image from "next/image";
 
+// ✨ UPDATED: Added 'isPageLink' to differentiate link types
 const LINKS = [
-  { href: "#work", label: "Work" },
-  { href: "#services", label: "Services" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#work", label: "Work", isPageLink: false },
+  { href: "/#services", label: "Services", isPageLink: false },
+  { href: "/about", label: "About", isPageLink: true }, // This is now a page link
+  { href: "/#contact", label: "Contact", isPageLink: false },
 ];
+
+// ✨ NEW: Helper function for smooth scrolling (prevents # in URL)
+const handleScroll = (e, id) => {
+  // 1. Prevent default <a> tag behavior
+  e.preventDefault();
+  
+  // 2. Get the target element ID (e.g., "services" from "/#services")
+  const targetId = id.split('#')[1];
+  if (!targetId) return; // Do nothing if no hash
+  
+  const element = document.getElementById(targetId);
+  
+  // 3. If the element exists, scroll to it smoothly
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+};
 
 const Header = () => {
   const headerRef = useRef(null);
@@ -21,6 +42,7 @@ const Header = () => {
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // All your original useEffects remain unchanged
   useEffect(() => {
     setLoaded(true);
     const hdr = headerRef.current;
@@ -71,7 +93,7 @@ const Header = () => {
     const underline = underlineRef.current;
     if (!nav || !underline) return;
 
-    const links = Array.from(nav.querySelectorAll("a"));
+    const links = Array.from(nav.querySelectorAll("a")); // This selector works for <Link> too
     const moveUnderline = (el) => {
       const r = el.getBoundingClientRect();
       const parent = nav.getBoundingClientRect();
@@ -178,6 +200,7 @@ const Header = () => {
           />
         </Link>
 
+        {/* Desktop nav */}
         <nav
           ref={navRef}
           className="ml-auto hidden md:flex items-center gap-8 uppercase text-xs tracking-[0.18em] relative z-10"
@@ -187,18 +210,20 @@ const Header = () => {
             className="absolute bottom-0 left-0 h-px bg-white/70 rounded-full"
             style={{ width: 0, opacity: 0, transform: "translateX(0px)" }}
           />
+          {/* ✨ UPDATED: Now uses Link and conditional onClick */}
           {LINKS.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
+              onClick={!l.isPageLink ? (e) => handleScroll(e, l.href) : undefined}
               className="relative py-2 text-white/90 hover:text-white transition-colors"
             >
               <span className="relative z-10">{l.label}</span>
-            </a>
+            </Link>
           ))}
         </nav>
 
-        {/* --- THIS IS THE UPDATED BUTTON --- */}
+        {/* Mobile menu icon (Updated with your requested styles) */}
         <button
           onClick={() => (menuOpen ? closeMenu() : openMenu())}
           className="ml-auto md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg 
@@ -227,10 +252,9 @@ const Header = () => {
             />
           </div>
         </button>
-        {/* --- END OF UPDATED BUTTON --- */}
-
       </div>
 
+      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 z-[600]" role="dialog" aria-modal="true">
           <div ref={backdropRef} className="absolute inset-0 bg-black/50" onClick={closeMenu} />
@@ -271,9 +295,13 @@ const Header = () => {
             <ul ref={listRef} className="mt-2 space-y-2">
               {LINKS.map((l) => (
                 <li key={l.href}>
-                  <a
+                  {/* ✨ UPDATED: Now uses Link and conditional onClick */}
+                  <Link
                     href={l.href}
-                    onClick={closeMenu}
+                    onClick={(e) => {
+                      if (!l.isPageLink) handleScroll(e, l.href);
+                      closeMenu();
+                    }}
                     className="group flex items-center justify-between rounded-xl px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                   >
                     <span className="uppercase tracking-[0.14em] text-[12px] text-white/90">
@@ -289,26 +317,28 @@ const Header = () => {
                     >
                       <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" />
                     </svg>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
 
             <div className="mt-4 grid grid-cols-2 gap-2">
-              <a
-                href="#contact"
+              {/* ✨ UPDATED: "Get a Quote" now links to /quote page */}
+              <Link
+                href="/quote" // Changed from #contact
                 onClick={closeMenu}
                 className="rounded-xl px-4 py-3 text-center bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 font-semibold text-sm"
               >
                 Get a Quote
-              </a>
-              <a
-                href="#work"
+              </Link>
+              {/* ✨ UPDATED: "View Work" is now "About Us" linking to /about */}
+              <Link
+                href="/about" // Changed from #work
                 onClick={closeMenu}
                 className="rounded-xl px-4 py-3 text-center bg-white/5 hover:bg-white/10 border border-white/10 font-semibold text-sm"
               >
-                View Work
-              </a>
+                About Us
+              </Link>
             </div>
           </div>
         </div>
