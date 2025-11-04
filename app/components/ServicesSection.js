@@ -99,7 +99,8 @@ const ServicesSection = () => {
   };
 
   return (
-    <section className="py-20 md:py-32 bg-neutral-900 text-white" id="services">
+    // ✨ FIX: Changed bg-neutral-900 to bg-black ✨
+    <section className="py-20 md:py-32 bg-black text-white" id="services">
       <div className="container mx-auto px-8">
         <div className="text-center mb-16">
           <h2 className="section-title text-5xl md:text-7xl font-bold tracking-tight font-heading uppercase">What We Offer</h2>

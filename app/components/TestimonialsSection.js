@@ -65,6 +65,11 @@ const TestimonialsSection = () => {
 
     // Current testimonial data
     const currentTestimonial = testimonials[currentIndex];
+    
+    // Check if currentTestimonial is valid before rendering
+    if (!currentTestimonial) {
+        return <div className="text-neutral-500 text-center h-64 flex items-center justify-center">Loading testimonial...</div>;
+    }
 
     return (
         <div className="relative max-w-3xl mx-auto min-h-64 md:min-h-72 flex items-center justify-center">
@@ -72,7 +77,9 @@ const TestimonialsSection = () => {
             {testimonials.length > 1 && (
                 <button
                     onClick={goToPrevious}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-800/50 hover:bg-neutral-700/70 text-white transition -ml-4 md:-ml-10"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-800/50 hover:bg-neutral-700/70 text-white transition -ml-4 md:-ml-10
+                               focus:outline-none focus-visible:ring-2 focus-visible:ring-white 
+                               focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     aria-label="Previous testimonial"
                 >
                     <ChevronLeft size={24} />
@@ -80,7 +87,7 @@ const TestimonialsSection = () => {
             )}
 
             {/* Testimonial Content with Animation */}
-            <AnimatePresence mode="wait"> {/* Use mode="wait" for smoother transitions */}
+            <AnimatePresence mode="wait">
                 <motion.div
                     key={currentIndex} // Key change triggers animation
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -103,6 +110,7 @@ const TestimonialsSection = () => {
                                     width={56}
                                     height={56}
                                     className="object-cover w-full h-full"
+                                    unoptimized // Assuming photo is from Cloudinary
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-neutral-500 text-xs">No Photo</div>
@@ -122,7 +130,9 @@ const TestimonialsSection = () => {
              {testimonials.length > 1 && (
                  <button
                     onClick={goToNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-800/50 hover:bg-neutral-700/70 text-white transition -mr-4 md:-mr-10"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-800/50 hover:bg-neutral-700/70 text-white transition -mr-4 md:-mr-10
+                               focus:outline-none focus-visible:ring-2 focus-visible:ring-white 
+                               focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     aria-label="Next testimonial"
                  >
                     <ChevronRight size={24} />
@@ -134,8 +144,9 @@ const TestimonialsSection = () => {
 
 
   return (
-    <section className="py-20 md:py-32 bg-neutral-900 text-white overflow-hidden"> {/* Added overflow-hidden */}
-      <div className="container mx-auto px-4 sm:px-8"> {/* Adjusted padding */}
+    // ✨ FIX: Changed bg-neutral-900 to bg-black and updated id
+    <section className="py-20 md:py-32 bg-black text-white overflow-hidden" id="testimonials">
+      <div className="container mx-auto px-4 sm:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="section-title text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight font-heading uppercase">Trusted By The Best</h2>
           <p className="text-md sm:text-lg text-neutral-400 mt-4 max-w-2xl mx-auto font-body">
