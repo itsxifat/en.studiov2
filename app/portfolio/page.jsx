@@ -3,36 +3,34 @@
 import React, { useState, useEffect } from "react";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Video, Camera } from 'lucide-react';
+// ✨ 1. Import ArrowRight for the new button
+import { ArrowLeft, Video, Camera, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link'; // ✨ 2. Import Link for the new button
 
 import { ClientPortfolioPage } from './_clientComponents';
 import { PhotographyGallery } from './_photographyGallery';
 
-// PortfolioHeader (No changes)
+// PortfolioHeader (Fixed bg-linear-to-b typo)
 const PortfolioHeader = () => {
   const router = useRouter();
 
   return (
     <header className="relative overflow-hidden border-b border-neutral-800/50 bg-gradient-to-b from-neutral-950 via-neutral-950 to-black">
-      {/* Subtle Background Pattern */}
       <div className="absolute inset-0 bg-grid-neutral-700/[0.03]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
 
-      {/* Back Button */}
       <motion.button
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 inline-flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white hover:border-[#53A4DB] focus:outline-none focus:ring-2 focus:ring-[#53A4DB] focus:ring-offset-2 focus:ring-offset-neutral-900 shadow-lg"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 inline-flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:text-white  shadow-lg"
         aria-label="Go back to previous page"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
       </motion.button>
 
-      {/* Compact Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 text-center py-12 sm:py-16">
-        {/* Logo */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -50,13 +48,13 @@ const PortfolioHeader = () => {
           />
         </motion.div>
 
-        {/* Title & Tagline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 font-heading">
+            {/* Fixed typo */}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-[#53A4DB] to-blue-400">
               Studio Portfolio
             </span>
@@ -66,14 +64,13 @@ const PortfolioHeader = () => {
           </p>
         </motion.div>
       </div>
-
-      {/* Bottom gradient */}
+      {/* Fixed typo */}
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" aria-hidden="true" />
     </header>
   );
 };
 
-// --- ✨ UPDATED Tab Selector Component ✨ ---
+// PortfolioTabSelector (Fixed typo & sticky issue)
 const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'video', label: 'Video Production', icon: Video },
@@ -81,10 +78,7 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    // ✨ FIX: Removed sticky, z-40, backdrop-blur, and bg-black/50.
-    // ✨ FIX: Changed p-4 to py-6 for simple spacing.
     <nav className="flex justify-center py-6 bg-transparent">
-      {/* ✨ FIX: Reduced padding from p-1.5 to p-1 */}
       <div className="flex space-x-2 p-1 rounded-xl bg-neutral-900/70">
         {tabs.map((tab) => (
           <motion.button
@@ -92,7 +86,6 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
             onClick={() => setActiveTab(tab.id)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            // ✨ FIX: Reduced padding for a smaller height
             className={`relative shrink-0 whitespace-nowrap rounded-lg px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-bold tracking-wide transition-all duration-200 ease-in-out focus:outline-none flex items-center gap-2.5 ${
               activeTab === tab.id
                 ? "text-white"
@@ -116,8 +109,9 @@ const PortfolioTabSelector = ({ activeTab, setActiveTab }) => {
   );
 };
 
-// Wrapper for your original Video/Web portfolio content (No Changes)
+// VideoPortfolio wrapper (No changes)
 const VideoPortfolio = () => {
+  // ... (no changes to this component)
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -167,12 +161,51 @@ const VideoPortfolio = () => {
       isLoading={isLoading}
     />
   );
-}
+};
+
+// --- ✨ NEW: Custom Project CTA Section ---
+const CustomProjectCTA = () => {
+  return (
+    <section className="container mx-auto px-4 sm:px-8 py-16 md:py-24 max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-6"
+      >
+        <div className="text-center lg:text-left">
+          <h2 className="text-3xl md:text-4xl font-bold font-heading text-white mb-3">
+            Need a Custom Project?
+          </h2>
+          <p className="text-lg text-neutral-400 max-w-2xl">
+            Looking for both video and photography, or have a unique request? 
+            We craft custom packages for TVCs, OVCs, and more. Let's build it together.
+          </p>
+        </div>
+        <div className="flex-shrink-0 w-full lg:w-auto">
+          <Link
+            href="/quote"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 h-12 w-full lg:w-auto
+                       bg-white text-black font-semibold rounded-lg
+                       transition-colors duration-300 ease-out
+                       hover:bg-neutral-200
+                       active:scale-95
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-white 
+                       focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          >
+            Get a Custom Quote <ArrowRight size={18} />
+          </Link>
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 
 
-// Main Page Component (No Changes)
+// --- Main Page Component (Updated) ---
 export default function PortfolioPage() {
-  const [activeTab, setActiveTab] = useState('video'); // 'video' or 'photography'
+  const [activeTab, setActiveTab] = useState('video');
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
@@ -196,7 +229,10 @@ export default function PortfolioPage() {
         </motion.div>
       </AnimatePresence>
 
-      <footer className="border-t border-neutral-800/50 mt-16 bg-black">
+      {/* ✨ NEW SECTION ADDED HERE */}
+      <CustomProjectCTA />
+
+      <footer className="border-t border-neutral-800/50 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-6 text-center">
           <p className="text-sm text-neutral-500">
             © {new Date().getFullYear()} En.Studio · All Rights Reserved
