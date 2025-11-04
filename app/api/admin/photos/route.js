@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import Photo from '../../../models/photo';
+import dbConnect from '../../../lib/dbConnect'; // Adjust path if needed
+import Photo from '../../../models/photo'; // Adjust path if needed
 import mongoose from 'mongoose';
 
 export async function GET(request) {
@@ -10,7 +10,7 @@ export async function GET(request) {
   const projectId = searchParams.get('projectId');
 
   if (!projectId || !mongoose.Types.ObjectId.isValid(projectId)) {
-    return NextResponse.json({ success: false, error: 'Valid Project ID is required.' }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'A valid Project ID is required.' }, { status: 400 });
   }
 
   try {

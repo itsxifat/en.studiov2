@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle, AlertTriangle, Loader2, Image as ImageIcon, X, Plus } from 'lucide-react';
 import Link from 'next/link';
-import Image from "next/image"; // ✨ --- THIS IS THE FIX --- ✨
+import Image from "next/image";
 
 // Reusable Message component
 const Message = ({ status, message }) => {
@@ -32,12 +32,10 @@ export default function UploadPhotographyPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // State updated for multiple files
-  const [files, setFiles] = useState([]);
-  const [previews, setPreviews] = useState([]);
+  const [files, setFiles] = useState([]); // Array of File objects
+  const [previews, setPreviews] = useState([]); // Array of Object URLs
   const fileInputRef = useRef(null);
 
-  // --- New state for projects ---
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
@@ -52,7 +50,7 @@ export default function UploadPhotographyPage() {
         if (data.success && Array.isArray(data.data)) {
           setProjects(data.data);
           if (data.data.length > 0) {
-            setSelectedProject(data.data[0]._id); // Default to first project
+            setSelectedProject(data.data[0]._id);
           }
         } else {
           console.error("Failed to load projects:", data.error);
@@ -98,14 +96,12 @@ export default function UploadPhotographyPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Function to remove a specific file by its index
   const removeFile = (indexToRemove) => {
     URL.revokeObjectURL(previews[indexToRemove]);
     setFiles(prev => prev.filter((_, index) => index !== indexToRemove));
     setPreviews(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  // Clear all files and previews
   const clearFiles = () => {
     previews.forEach(url => URL.revokeObjectURL(url));
     setFiles([]);
@@ -113,7 +109,7 @@ export default function UploadPhotographyPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Handle submit for multiple files
+  // --- ✨ NEW UPLOAD LOGIC ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting || files.length === 0 || !selectedProject) {
@@ -124,36 +120,89 @@ export default function UploadPhotographyPage() {
 
     setIsSubmitting(true);
     setStatus('loading');
-    setMessage(`Uploading ${files.length} photo(s)...`);
-
-    const formData = new FormData();
-    formData.append('projectId', selectedProject);
     
-    files.forEach(file => {
-      formData.append('files', file);
-    });
-    
-    try {
-      const res = await fetch('/api/admin/photography/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
+    let uploadedCount = 0;
+    const totalFiles = files.length;
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Needs to be public
+    const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;   // Needs to be public
 
-      if (res.ok && data.success) {
-        setStatus('success');
-        setMessage(`${data.count} photo(s) uploaded and linked!`);
-        clearFiles();
-      } else {
-        throw new Error(data.error || 'Upload failed.');
-      }
-    } catch (error) {
-      setStatus('error');
-      setMessage(`Network Error: ${error.message || 'Failed to submit.'}`);
-    } finally {
-      setIsSubmitting(false);
-      setTimeout(() => setStatus(null), 5000);
+    if (!cloudName || !apiKey) {
+        setStatus('error');
+        setMessage('Client-side Cloudinary config is missing.');
+        setIsSubmitting(false);
+        return;
     }
+
+    // Process files one by one
+    for (let i = 0; i < totalFiles; i++) {
+      const file = files[i];
+      setMessage(`Uploading ${i + 1} of ${totalFiles}: ${file.name}...`);
+
+      try {
+        // 1. Get signature from our backend
+        const sigRes = await fetch('/api/admin/photography/sign-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ folder: 'portfolio_photos' }),
+        });
+        const sigData = await sigRes.json();
+        if (!sigData.success) throw new Error(sigData.error || 'Could not get upload signature.');
+
+        // 2. Prepare FormData for Cloudinary (Browser -> Cloudinary)
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append('file', file);
+        cloudinaryFormData.append('api_key', apiKey);
+        cloudinaryFormData.append('timestamp', sigData.timestamp);
+        cloudinaryFormData.append('signature', sigData.signature);
+        cloudinaryFormData.append('folder', 'portfolio_photos');
+
+        // 3. Upload DIRECTLY to Cloudinary
+        const cloudinaryUploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+        
+        const uploadRes = await fetch(cloudinaryUploadUrl, {
+          method: 'POST',
+          body: cloudinaryFormData,
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error('Cloudinary upload failed.');
+        }
+
+        const uploadData = await uploadRes.json();
+
+        // 4. Send Cloudinary URL to OUR backend to save in DB
+        const saveRes = await fetch('/api/admin/photography/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId: selectedProject,
+            publicId: uploadData.public_id,
+            imageUrl: uploadData.secure_url,
+            width: uploadData.width,
+            height: uploadData.height,
+          }),
+        });
+
+        if (!saveRes.ok) {
+          throw new Error('Failed to save photo metadata to our database.');
+        }
+        
+        uploadedCount++;
+
+      } catch (error) {
+        setStatus('error');
+        setMessage(`Failed to upload ${file.name}: ${error.message}`);
+        setIsSubmitting(false);
+        return; // Stop on first error
+      }
+    }
+
+    // If all successful
+    setStatus('success');
+    setMessage(`Successfully uploaded ${uploadedCount} photo(s)!`);
+    clearFiles();
+    setIsSubmitting(false);
+    setTimeout(() => setStatus(null), 5000);
   };
 
   return (
@@ -167,7 +216,6 @@ export default function UploadPhotographyPage() {
       <div className="bg-neutral-900 border border-neutral-800 p-8 rounded-xl shadow-lg mt-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           
-          {/* --- Project Selector --- */}
           <div>
             <label htmlFor="projectId" className="block text-sm font-semibold mb-2 text-neutral-300">Link to Project *</label>
             <select
@@ -193,11 +241,9 @@ export default function UploadPhotographyPage() {
             )}
           </div>
 
-          {/* --- File Upload Area for Multiple Files --- */}
           <div>
             <label className="block text-sm font-semibold mb-2 text-neutral-300">Photos *</label>
             
-            {/* --- Preview Grid --- */}
             {previews.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4">
                 {previews.map((previewUrl, index) => (
@@ -222,7 +268,6 @@ export default function UploadPhotographyPage() {
               </div>
             )}
             
-            {/* --- Upload Dropzone / Button --- */}
             <div 
               className={`flex justify-center items-center w-full px-6 py-10 border-2 border-neutral-700 border-dashed rounded-lg cursor-pointer hover:border-cyan-500 transition-colors`}
               onClick={() => fileInputRef.current?.click()}
@@ -245,9 +290,6 @@ export default function UploadPhotographyPage() {
             />
           </div>
 
-          {/* --- Title & Description fields are REMOVED --- */}
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting || files.length === 0 || !selectedProject || isLoadingProjects}

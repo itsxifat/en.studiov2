@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../../lib/dbConnect';
-import Photo from '../../../../models/photo';
+import dbConnect from '../../../../lib/dbConnect'; // Adjust path
+import Photo from '../../../../models/photo'; // Adjust path
 import { v2 as cloudinary } from 'cloudinary';
 import mongoose from 'mongoose';
 
+// Configure Cloudinary (must be done in each file)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

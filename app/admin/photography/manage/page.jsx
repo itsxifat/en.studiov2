@@ -13,9 +13,10 @@ const Notification = ({ message, type, onDismiss }) => {
     const timer = setTimeout(onDismiss, 3000);
     return () => clearTimeout(timer);
   }, [onDismiss]);
+
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-      className={`fixed top-24 right-1/2 translate-x-1/2 z-50 p-4 rounded-md border backdrop-blur-sm shadow-lg ${styles}`}>
+      className={`fixed top-24 right-1/2 translate-x-1/2 z-[1001] p-4 rounded-md border backdrop-blur-sm shadow-lg ${styles}`}>
       <div className="flex items-center gap-2">
         {type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
         {message}
@@ -242,7 +243,7 @@ export default function ManagePhotographyPage() {
     setIsLoadingProjects(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/photo-projects');
+      const res = await fetch('/api/admin/photo-projects'); // Fetches all projects
       const data = await res.json();
       if (data.success) {
         setProjects(data.data);
@@ -265,7 +266,7 @@ export default function ManagePhotographyPage() {
     setIsLoadingPhotos(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/photos?projectId=${projectId}`);
+      const res = await fetch(`/api/admin/photos?projectId=${projectId}`); // Use new API route
       const data = await res.json();
       if (data.success) {
         setPhotos(data.data);
@@ -310,7 +311,7 @@ export default function ManagePhotographyPage() {
   const handleSaveEdit = async (photoId, formData) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(`/api/admin/photos/${photoId}`, {
+      const res = await fetch(`/api/admin/photos/${photoId}`, { // Use new API route
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -332,13 +333,13 @@ export default function ManagePhotographyPage() {
   };
 
   // Handle deleting a photo
-  const handleDelete = async (photoId, publicId) => {
+  const handleDelete = async (photoId, publicId_unused) => { // publicId not needed here
     if (!window.confirm("Are you sure you want to permanently delete this photo?")) {
       return;
     }
 
     try {
-      const res = await fetch(`/api/admin/photos/${photoId}`, {
+      const res = await fetch(`/api/admin/photos/${photoId}`, { // Use new API route
         method: 'DELETE',
       });
 
