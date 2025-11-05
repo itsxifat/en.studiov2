@@ -9,7 +9,7 @@ const baiJamjuree = Bai_Jamjuree({
   variable: "--font-bai-jamjuree", // Use CSS variable
 });
 
-// --- ✨ NEW: SEO Metadata ---
+// --- SEO Metadata ---
 export const metadata = {
   // Title
   title: {
@@ -18,6 +18,12 @@ export const metadata = {
   },
   // Description (using your keywords)
   description: "Enfinito Studio is a professional production house and sister concern of Enfinito. We specialize in high-end videography, photography, TVCs, and OVCs, providing the best service for shoots with or without models.",
+  
+  // ✨ GOOGLE VERIFICATION TAG ADDED HERE ✨
+  verification: {
+    google: "rsuFwQK8yCQ5s2MUD_SHYGYhe2Mv-T6D6bWAHnWZeUM",
+  },
+  
   // Keywords
   keywords: [
     "Enfinito Studio",
@@ -37,14 +43,12 @@ export const metadata = {
     index: true,
     follow: true,
   },
-  // TODO: Replace with your actual website URL
   metadataBase: new URL("https://en-studio.enfinito.com"), 
   openGraph: {
     title: "Enfinito Studio - Professional Video & Photo Production",
     description: "Specializing in high-end videography, photography, TVCs, and OVCs.",
     url: "https://en-studio.enfinito.com",
     siteName: "Enfinito Studio",
-    // TODO: Add a public URL to your logo for social sharing
     images: [
       {
         url: "https://res.cloudinary.com/dagmsvwui/image/upload/v1762236962/Post_01_1_ze4atm.png", 
@@ -63,10 +67,6 @@ export default function RootLayout({ children }) {
   return (
     // Pass the font variable to the <html> tag
     <html lang="en" className={`${baiJamjuree.variable} no-scrollbar`}>
-      {/* - Use `font-sans` to apply the font-family defined by the variable
-        - `antialiased` makes the font look smoother
-        - `bg-black text-white` sets the default site theme
-      */}
       <body className={`font-sans antialiased bg-black text-white`}>
         {children}
       </body>
