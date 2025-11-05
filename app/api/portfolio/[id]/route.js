@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../../../lib/dbConnect';
-import PortfolioItem from '../../../../../models/portfolioItem';
-import { extractYoutubeId } from '../../../../../lib/youtubeHelper';
+import dbConnect from '../../../lib/dbConnect';
+import PortfolioItem from '../../../models/portfolioItem';
+import { extractYoutubeId } from '../../../lib/youtubeHelper';
 import mongoose from 'mongoose';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
