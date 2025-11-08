@@ -9,6 +9,7 @@ export async function POST(request) {
     const adminPassword = process.env.ADMIN_PASSWORD;
     const jwtSecret = process.env.JWT_SECRET_KEY;
 
+    // This check is what is failing
     if (!adminPassword || !jwtSecret) {
       throw new Error('Server environment is not configured for auth.');
     }
@@ -40,7 +41,7 @@ export async function POST(request) {
     return NextResponse.json({ success: true }, { status: 200 });
 
   } catch (error) {
-    console.error('Login API Error:', error);
+    console.error('Login API Error:', error.message);
     return NextResponse.json({ success: false, error: error.message || 'An error occurred.' }, { status: 500 });
   }
 }
