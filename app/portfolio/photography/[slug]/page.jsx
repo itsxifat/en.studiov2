@@ -1,110 +1,61 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Loader2 as Loader, 
   AlertTriangle, 
   ArrowLeft, 
   Video, 
-  Image as ImageIcon, 
-  X, 
-  ZoomIn, 
-  ZoomOut 
+  Image as ImageIcon,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-// ✨ We ONLY import YouTubeEmbed from the client components now
 import { YouTubeEmbed } from '../../_clientComponents'; 
 
-// --- ✨ NEW: Professional Image Lightbox with Zoom ✨ ---
-const ImageLightBox = ({ imageUrl, alt, onClose }) => {
-  const [isZoomed, setIsZoomed] = useState(false);
+// --- ✨ 1. Import the new Lightbox library ---
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
-  useEffect(() => {
-    // Close modal on Escape key
-    const handleEscape = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleEscape);
-    // Disable page scrolling
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = ""; // Re-enable scrolling
-    };
-  }, [onClose]);
-
-  const toggleZoom = (e) => {
-    e.stopPropagation(); // Prevent modal from closing
-    setIsZoomed(!isZoomed);
-  };
+// --- ✨ 2. NEW: Professional Image Carousel Lightbox ---
+const ImageCarouselModal = ({ photos, index, onClose }) => {
+  // Create a 'slides' array for the lightbox
+  const slides = photos.map(photo => ({
+    src: photo.imageUrl,
+    width: photo.width,
+    height: photo.height,
+  }));
 
   return (
-    <motion.div
-      key="lightbox-backdrop"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed inset-0 z-1000 flex items-center justify-center p-4 backdrop-blur-xl"
-      style={{ backgroundColor: "rgba(5, 5, 10, 0.92)" }}
-      onClick={onClose} // Click backdrop to close
-      role="dialog"
-      aria-modal="true"
-      aria-label="Enlarged photo view"
-    >
-      {/* --- Close Button --- */}
-      <motion.button
-        onClick={onClose}
-        whileHover={{ scale: 1.1, rotate: 90 }}
-        whileTap={{ scale: 0.9, rotate: 0 }}
-        className="absolute top-4 right-4 z-30 rounded-full bg-black/70 p-2.5 text-neutral-300 border border-neutral-700/50 
-                   transition-colors hover:bg-red-600/80 hover:text-white"
-        aria-label="Close modal"
-      >
-        <X size={22} strokeWidth={2.5} />
-      </motion.button>
-      
-      {/* --- Zoom Toggle Button --- */}
-      <motion.button
-        onClick={toggleZoom}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="absolute top-4 left-4 z-30 rounded-full bg-black/70 p-2.5 text-neutral-300 border border-neutral-700/50 
-                   transition-colors hover:bg-neutral-700/80 hover:text-white"
-        aria-label={isZoomed ? "Zoom out" : "Zoom in"}
-      >
-        {isZoomed ? <ZoomOut size={22} strokeWidth={2.5} /> : <ZoomIn size={22} strokeWidth={2.5} />}
-      </motion.button>
-
-      {/* --- Image Container (handles scrolling when zoomed) --- */}
-      <motion.div
-        key={imageUrl}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
-        // This div is now the scrollable container when zoomed
-        className={`relative w-full h-full max-w-full max-h-full flex items-center justify-center ${isZoomed ? 'overflow-auto custom-scrollbar' : 'overflow-hidden'}`}
-        onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking image
-      >
-        {/* The Image itself */}
-        <Image
-          src={imageUrl}
-          alt={alt || "Enlarged portfolio photo"}
-          width={1920} // Use a high-resolution width hint
-          height={1080} // Use a high-resolution height hint
-          // This dynamically changes the class to enable zoom
-          className={`transition-all duration-300 ${
-            isZoomed
-              ? 'object-none w-auto h-auto max-w-none max-h-none' // Native size
-              : 'object-contain w-full h-full max-w-full max-h-full rounded-lg' // Fit to screen
-          }`}
-          onClick={toggleZoom} // Also allow toggling zoom by clicking the image
-          priority
-        />
-      </motion.div>
-    </motion.div>
+    <Lightbox
+      open={index >= 0}
+      index={index}
+      close={onClose}
+      slides={slides}
+      // Enable the zoom plugin
+      plugins={[Zoom]}
+      // Performance and UI optimizations
+      animation={{ fade: 300, swipe: 500 }}
+      carousel={{
+        padding: "0px",
+        imageFit: "contain",
+      }}
+      styles={{
+        container: { backgroundColor: "rgba(5, 5, 10, 0.92)" },
+        icon: { color: "#fff", filter: "drop-shadow(0 0 5px rgba(0,0,0,0.8))" },
+      }}
+      // Use Lucide icons for a consistent look
+      render={{
+        iconPrev: () => <ChevronLeft size={24} />,
+        iconNext: () => <ChevronRight size={24} />,
+        iconClose: () => <X size={22} strokeWidth={2.5} />,
+        iconZoomIn: () => null, // Hide default zoom icons
+        iconZoomOut: () => null,
+      }}
+    />
   );
 };
 
@@ -113,11 +64,11 @@ const ImageLightBox = ({ imageUrl, alt, onClose }) => {
 const MasonryGrid = ({ photos, onImageClick }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {photos.map((photo) => (
+      {photos.map((photo, index) => ( // ✨ Pass index to onImageClick
         <motion.div
           key={photo._id}
           className="cursor-pointer overflow-hidden rounded-lg border border-neutral-800/60"
-          onClick={() => onImageClick(photo)}
+          onClick={() => onImageClick(index)} // ✨ Pass index
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
@@ -129,7 +80,9 @@ const MasonryGrid = ({ photos, onImageClick }) => {
             width={photo.width}
             height={photo.height}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="w-full h-auto" // Key for masonry
+            // ✨ FIX: Removed className="w-full h-auto"
+            // This will force next/image to respect the aspect ratio
+            // within the bounds of the grid column.
             unoptimized={photo.imageUrl.includes('cloudinary')}
           />
         </motion.div>
@@ -189,13 +142,16 @@ const BehindTheScenes = ({ btsItems }) => {
 const ProjectHeader = ({ project }) => {
   const router = useRouter();
   return (
-    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-linear-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
+    // ✨ FIX: Typo bg-linear-to-b -> bg-gradient-to-b
+    <header className="relative overflow-hidden border-b border-neutral-800/50 bg-gradient-to-b from-neutral-950 via-neutral-950 to-black pb-12 pt-20">
       <div className="absolute inset-0 bg-grid-neutral-700/[0.03]" />
       <motion.button
         onClick={() => router.back()}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all hover:bg-neutral-800/80 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#53A4DB]"
+        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all 
+                   hover:bg-neutral-800/80 hover:text-white 
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500" // Cleaned focus
         aria-label="Go back"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -232,7 +188,7 @@ export default function PhotographyProjectPage() {
   const [btsItems, setBtsItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null); // Will store { highResUrl, filename }
+  const [lightboxIndex, setLightboxIndex] = useState(-1); // ✨ Use -1 to signify "closed"
 
   useEffect(() => {
     if (!slug) return;
@@ -259,15 +215,13 @@ export default function PhotographyProjectPage() {
     fetchProjectData();
   }, [slug]);
 
-  const openModal = (photo) => {
-    setSelectedImage({
-      highResUrl: photo.imageUrl,
-      filename: photo.title || 'Project Photo'
-    });
+  // ✨ Updated to open modal with the clicked image's index
+  const openModal = (index) => {
+    setLightboxIndex(index);
   };
 
   const closeModal = () => {
-    setSelectedImage(null);
+    setLightboxIndex(-1);
   };
 
   if (isLoading) {
@@ -284,7 +238,8 @@ export default function PhotographyProjectPage() {
          <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-800/50 bg-linear-to-br from-red-900/20 to-neutral-950/40 p-12 py-16 text-center"
+          // ✨ FIX: Typo bg-linear-to-br -> bg-gradient-to-br
+          className="rounded-xl border border-red-800/50 bg-gradient-to-br from-red-900/20 to-neutral-950/40 p-12 py-16 text-center"
         >
           <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-5" aria-hidden="true" />
           <h2 className="text-2xl font-bold font-heading text-red-300 mb-2">Error Loading Project</h2>
@@ -317,16 +272,12 @@ export default function PhotographyProjectPage() {
         </div>
       </footer>
 
-      {/* --- ✨ USE THE NEW ImageLightBox ✨ --- */}
-      <AnimatePresence>
-        {selectedImage && (
-          <ImageLightBox
-            imageUrl={selectedImage.highResUrl}
-            alt={selectedImage.filename}
-            onClose={closeModal}
-          />
-        )}
-      </AnimatePresence>
+      {/* --- ✨ Use the new ImageCarouselModal ✨ --- */}
+      <ImageCarouselModal
+        photos={photos}
+        index={lightboxIndex}
+        onClose={closeModal}
+      />
     </main>
   );
 }

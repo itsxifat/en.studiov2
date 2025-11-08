@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 const CATEGORY_API = '/api/admin/category';
-const PORTFOLIO_API = '/api/portfolio'; 
+const PORTFOLIO_API = '/api/portfolio';
 
 export default function AdminPortfolioPage() {
     const [status, setStatus] = useState(null);
@@ -74,7 +74,6 @@ export default function AdminPortfolioPage() {
             setMessage(`Network Error: ${error.message || 'Failed to submit.'}`);
         } finally {
             setIsSubmitting(false);
-            // Keep message displayed for 5 seconds
             setTimeout(() => setStatus(null), 5000); 
         }
     };
@@ -180,8 +179,6 @@ export default function AdminPortfolioPage() {
                         />
                          <p className="text-xs mt-1 text-neutral-500">Leave blank to use the auto-generated YouTube thumbnail.</p>
                     </div>
-
-                    {/* ✨ Live URL and GitHub URL fields are REMOVED ✨ */}
 
                     {/* Submit Button */}
                     <button

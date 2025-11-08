@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, AlertTriangle, CheckCircle, Edit, Trash2, X, Search, ListVideo } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link';
 
 // --- Notification Component ---
 const Notification = ({ message, type, onDismiss }) => {
@@ -24,7 +24,7 @@ const Notification = ({ message, type, onDismiss }) => {
   );
 };
 
-// --- ✨ Edit Video Modal (Updated) ✨ ---
+// --- Edit Video Modal ---
 const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categories }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -32,7 +32,6 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
     description: '',
     youtubeLink: '',
     thumbnail: '',
-    // liveUrl and githubUrl removed
   });
 
   useEffect(() => {
@@ -43,7 +42,6 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
         description: item.description || '',
         youtubeLink: item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '',
         thumbnail: item.thumbnail || '',
-        // liveUrl and githubUrl removed
       });
     }
   }, [item]);
@@ -57,7 +55,7 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(item._id, formData); // formData is now smaller
+    onSave(item._id, formData);
   };
 
   return (
@@ -74,10 +72,9 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
         <form onSubmit={handleSubmit}>
           <div className="flex justify-between items-center p-4 border-b border-neutral-800 sticky top-0 bg-neutral-900 z-10">
             <h3 className="text-lg font-semibold text-white">Edit Video Project</h3>
-            <button typeC="button" onClick={onClose} className="text-neutral-500 hover:text-white"><X size={20} /></button>
+            <button type="button" onClick={onClose} className="text-neutral-500 hover:text-white"><X size={20} /></button>
           </div>
           <div className="p-6 space-y-4">
-            {/* Form fields (liveUrl and githubUrl removed) */}
             <div>
               <label htmlFor="title" className="block text-sm font-semibold mb-2 text-neutral-300">Project Title *</label>
               <input id="title" name="title" value={formData.title} onChange={handleChange} required className="w-full font-body bg-neutral-800 border border-neutral-700 p-3 rounded-lg focus:ring-2 focus:ring-[#53A4DB]" />
@@ -109,7 +106,7 @@ const EditVideoModal = ({ item, isOpen, onClose, onSave, isSubmitting, categorie
             <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-neutral-300 bg-neutral-700 hover:bg-neutral-600 rounded-md transition disabled:opacity-50">
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-black bg-[#53A4DB] hover:bg-[#53A4DB] rounded-md transition disabled:opacity-50 flex items-center gap-2">
+            <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-black bg-[#53A4DB] hover:bg-cyan-600 rounded-md transition disabled:opacity-50 flex items-center gap-2">
               {isSubmitting && <Loader2 size={16} className="animate-spin" />}
               Save Changes
             </button>
@@ -133,12 +130,13 @@ export default function ManageVideoPortfolioPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // ✨ UPDATED fetchAllData to call the new secure admin route
   const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const [itemRes, catRes] = await Promise.all([
-        fetch('/api/portfolio'),
+        fetch('/api/admin/portfolio'), // ✨ Use secure route
         fetch('/api/admin/category')
       ]);
       
@@ -189,6 +187,7 @@ export default function ManageVideoPortfolioPage() {
     setEditingItem(null);
   };
 
+  // ✨ This function will now work correctly
   const handleSaveEdit = async (id, formData) => {
     setIsSubmitting(true);
     try {
@@ -203,7 +202,7 @@ export default function ManageVideoPortfolioPage() {
         handleCloseModal();
         fetchAllData();
       } else {
-        throw new Error(data.error || 'Failed to update photo.');
+        throw new Error(data.error || 'Failed to update item.'); // Corrected message
       }
     } catch (err) {
       showNotification('error', err.message);
@@ -212,6 +211,7 @@ export default function ManageVideoPortfolioPage() {
     }
   };
 
+  // ✨ This function will now work correctly
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to permanently delete this video project?")) {
       return;
@@ -225,7 +225,7 @@ export default function ManageVideoPortfolioPage() {
         setItems(prevItems => prevItems.filter(p => p._id !== id));
         showNotification('success', 'Video project deleted.');
       } else {
-        throw new Error(data.error || 'Failed to delete photo.');
+        throw new Error(data.error || 'Failed to delete item.'); // Corrected message
       }
     } catch (err) {
       showNotification('error', err.message);

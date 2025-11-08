@@ -1,21 +1,10 @@
-"use client"; // Required for hooks and client-side components
-
+"use client";
 import React from 'react';
 import Link from 'next/link';
-// ✨ Import 'ListVideo' icon
 import { 
-  Video, 
-  List, 
-  LayoutDashboard, 
-  Camera, 
-  UploadCloud, 
-  Star, 
-  MessageSquareText, 
-  Layers, 
-  Package, 
-  FolderHeart, 
-  Clapperboard,
-  ListVideo // ✨ Added here
+  Video, List, LayoutDashboard, Camera, UploadCloud, Star, 
+  MessageSquareText, Layers, Package, FolderHeart, Clapperboard,
+  ListVideo // ✨ Added
 } from 'lucide-react';
 import { Bai_Jamjuree } from "next/font/google";
 import Image from 'next/image';
@@ -30,7 +19,7 @@ const baiJamjuree = Bai_Jamjuree({
 const navLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/portfolio', label: 'Add Video Project', icon: Video },
-  { href: '/admin/portfolio/manage', label: 'Manage Videos', icon: ListVideo }, // ✨ THIS LINK IS NOW ADDED
+  { href: '/admin/portfolio/manage', label: 'Manage Videos', icon: ListVideo }, // ✨ ADDED
   { href: '/admin/photography/projects', label: 'Photo Projects', icon: FolderHeart },
   { href: '/admin/photography/upload', label: 'Upload Photo', icon: UploadCloud },
   { href: '/admin/photography/manage', label: 'Manage Photos', icon: Camera },
@@ -42,38 +31,24 @@ const navLinks = [
   { href: '/admin/category', label: 'Manage Categories', icon: List },
 ];
 
-// --- Custom Scrollbar Styles ---
 const GlobalScrollbarStyles = () => (
   <style jsx global>{`
-    .admin-sidebar-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .admin-sidebar-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .admin-sidebar-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #3f3f46; /* neutral-700 */
-      border-radius: 6px;
-    }
-    .admin-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-      background-color: #52525b; /* neutral-600 */
-    }
-    .admin-sidebar-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #3f3f46 transparent;
-    }
+    .admin-sidebar-scrollbar::-webkit-scrollbar { width: 6px; }
+    .admin-sidebar-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .admin-sidebar-scrollbar::-webkit-scrollbar-thumb { background-color: #3f3f46; border-radius: 6px; }
+    .admin-sidebar-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #52525b; }
+    .admin-sidebar-scrollbar { scrollbar-width: thin; scrollbar-color: #3f3f46 transparent; }
   `}</style>
 );
 
 const Sidebar = () => (
   <nav className="fixed left-0 top-0 h-screen w-64 bg-neutral-900 border-r border-neutral-800 p-6 flex flex-col z-40">
-    <GlobalScrollbarStyles /> {/* Adds the custom scrollbar styles */}
+    <GlobalScrollbarStyles />
     <div className="flex items-center mb-10">
        <Image src="/logo.png" alt="En.Studio Admin" width={32} height={32} className="mr-3" priority />
        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Admin</h1>
     </div>
     
-    {/* Added custom scrollbar class */}
     <ul className="space-y-3 overflow-y-auto admin-sidebar-scrollbar pr-2">
       {navLinks.map((link) => {
         const Icon = link.icon;
@@ -81,7 +56,6 @@ const Sidebar = () => (
           <li key={link.href}>
             <Link
               href={link.href}
-              // Removed focus:ring-* classes
               className="flex items-center gap-3 px-4 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-[#53A4DB] transition-colors duration-200 focus:outline-none focus:bg-neutral-800"
             >
               <Icon size={20} />
@@ -95,7 +69,6 @@ const Sidebar = () => (
     <div className="mt-auto pt-6 border-t border-neutral-800">
       <Link 
         href="/" 
-        // Removed focus:ring-* classes
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors focus:outline-none focus:text-white rounded p-1 -m-1"
       >
         <LayoutDashboard size={16} />
