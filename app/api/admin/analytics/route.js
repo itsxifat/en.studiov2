@@ -12,10 +12,11 @@ export async function GET() {
       liveVisitorsDocs,
       topPages,
       topReferrers,
+      topSources, // ✨ NEW: Get top UTM sources
       dailyTraffic,
       totalViews,
       totalUniquesDocs,
-      latestVisits // ✨ Fetch latest visits
+      latestVisits
     ] = await Promise.all([
       // 1. "Live" Visitors (Unique raw IPs in last 5 mins)
       Visit.distinct('ip', { timestamp: { $gt: fiveMinutesAgo } }).exec(),
@@ -28,15 +29,23 @@ export async function GET() {
         { $limit: 10 }
       ]).exec(),
 
-      // 3. Top Referrers (last 30 days)
+      // 3. Top Referrers (Domains)
       Visit.aggregate([
         { $match: { timestamp: { $gt: thirtyDaysAgo }, referrer: { $ne: null } } },
         { $group: { _id: '$referrer', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 10 }
       ]).exec(),
+
+      // ✨ 4. Top Sources (UTM parameters)
+      Visit.aggregate([
+        { $match: { timestamp: { $gt: thirtyDaysAgo }, source: { $ne: null } } },
+        { $group: { _id: '$source', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 }
+      ]).exec(),
       
-      // 4. Daily Traffic Graph (last 30 days)
+      // 5. Daily Traffic Graph
       Visit.aggregate([
         { $match: { timestamp: { $gt: thirtyDaysAgo } } },
         {
@@ -48,17 +57,17 @@ export async function GET() {
         { $sort: { _id: 1 } }
       ]).exec(),
 
-      // 5. All-Time Page Views
+      // 6. All-Time Page Views
       Visit.countDocuments().exec(),
       
-      // 6. All-Time Unique Visitors (by raw IP)
+      // 7. All-Time Unique Visitors (by raw IP)
       Visit.distinct('ip').exec(),
       
-      // 7. Get the 10 most recent visits to show IPs
+      // 8. Get the 10 most recent visits to show IPs
       Visit.find({})
         .sort({ timestamp: -1 })
         .limit(10)
-        .select('ip path timestamp') // Select only the data we need
+        .select('ip path timestamp')
         .lean()
         .exec()
     ]);
@@ -77,10 +86,11 @@ export async function GET() {
         liveVisitors: liveVisitorsCount,
         topPages,
         topReferrers,
+        topSources, // ✨ Send new data
         dailyTraffic: formattedDailyTraffic,
         allTimeViews: totalViews,
         allTimeUniques: totalUniques,
-        latestVisits: latestVisits // ✨ Send new data to frontend
+        latestVisits: latestVisits
       } 
     });
 

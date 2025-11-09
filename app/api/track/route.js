@@ -2,47 +2,54 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../lib/dbConnect';
 import Visit from '../../models/visit';
 import { headers } from 'next/headers';
-// crypto library removed
 
+// This API route is fast and logs visits in the background
 export async function POST(request) {
   try {
     const body = await request.json();
-    const path = body.path;
+    const { path, referrer: clientReferrer, search: clientSearch } = body;
+    
     if (!path) {
       return NextResponse.json({ success: false, error: 'Path is required.' }, { status: 400 });
     }
 
     const headersList = headers();
-    
-    // ✨ Get user's raw IP
     const ip = headersList.get('x-forwarded-for') || headersList.get('cf-connecting-ip') || request.ip || 'unknown';
     const userAgent = headersList.get('user-agent') || 'unknown';
     
-    let referrer = headersList.get('referer') || null;
+    let referrerDomain = null;
     const websiteUrl = process.env.YOUR_WEBSITE_URL 
       ? new URL(process.env.YOUR_WEBSITE_URL).hostname 
       : null;
 
-    if (referrer) {
-      const url = new URL(referrer);
+    // 1. Parse the referrer domain
+    if (clientReferrer) {
+      const url = new URL(clientReferrer);
       const host = url.hostname.replace(/^www\./, '');
       
       if (websiteUrl && !host.includes(websiteUrl)) {
-        referrer = host;
-      } else if (!websiteUrl) {
-         referrer = host;
-      } else {
-        referrer = null; // It's a self-referral
+        referrerDomain = host;
+      } else if (!websiteUrl && host) {
+         referrerDomain = host;
       }
+      // if it's a self-referral, referrerDomain remains null
+    }
+
+    // 2. Parse the UTM source from the CURRENT page's query string
+    let utmSource = null;
+    if (clientSearch) {
+      const params = new URLSearchParams(clientSearch);
+      utmSource = params.get('utm_source'); // This tracks "facebook", "instagram", etc.
     }
 
     // Connect to DB, but DON'T await the save operation.
     dbConnect().then(() => {
       Visit.create({
         path: path,
-        ip: ip, // ✨ Store raw IP
+        ip: ip,
         userAgent: userAgent,
-        referrer: referrer,
+        referrer: referrerDomain,
+        source: utmSource, // Save the new source
       }).catch(dbError => {
         console.error("Failed to log visit:", dbError);
       });

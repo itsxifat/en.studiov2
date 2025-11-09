@@ -24,6 +24,11 @@ const VisitSchema = new mongoose.Schema({
     trim: true,
     index: true,
   },
+  source: {
+    type: String,
+    trim: true,
+    index: true,
+  },
   // Timestamp of the visit
   timestamp: {
     type: Date,

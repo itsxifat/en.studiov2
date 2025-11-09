@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Video, Camera, MessageSquareText, Layers, Loader2, 
   AlertTriangle, BarChart3, Package, Clapperboard, FolderHeart, Users, Eye,
-  List, Terminal // Import Terminal icon
+  List, Terminal, Link as LinkIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
   const [analytics, setAnalytics] = useState(null);
   const [isLoadingContent, setIsLoadingContent] = useState(true);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
-  const [error, setError] = useState(null); // Combined error state
+  const [error, setError] = useState(null);
 
   // Fetcher for content stats
   const fetchContentStats = async () => {
@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
         throw new Error(data.error || 'Failed to fetch content stats.');
       }
     } catch (err) {
-      setError(err.message); // Set error
+      setError(err.message);
     } finally {
       setIsLoadingContent(false);
     }
@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
 
   // Fetcher for all analytics data
   const fetchAnalytics = async () => {
-    if (!analytics) { // Only show main loader on first load
+    if (!analytics) {
       setIsLoadingAnalytics(true);
     }
     try {
@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
         throw new Error(data.error || 'Failed to fetch analytics.');
       }
     } catch (err) {
-      setError(err.message); // Set error
+      setError(err.message);
     } finally {
       setIsLoadingAnalytics(false);
     }
@@ -83,29 +83,24 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/analytics');
       const data = await res.json();
       if (res.ok && data.success) {
-        // Only update the live data
         setAnalytics(prev => ({
-          ...(prev || data.data), // Use previous data as base
+          ...(prev || data.data),
           liveVisitors: data.data.liveVisitors,
-          latestVisits: data.data.latestVisits, // Also refresh latest visits
+          latestVisits: data.data.latestVisits,
         }));
       } else {
         throw new Error(data.error || 'Failed to fetch live data.');
       }
     } catch (err) {
-      console.error(err.message); // Log polling errors quietly
+      console.error(err.message);
     }
   };
 
   useEffect(() => {
-    // Fetch all data on initial load
     fetchContentStats();
     fetchAnalytics();
-
-    // ✨ Set up polling to refresh "live" data every 1 minute
-    const interval = setInterval(fetchLiveData, 60000); // 60,000ms = 1 minute
-    
-    // Clear interval on unmount
+    // Poll every 1 minute
+    const interval = setInterval(fetchLiveData, 60000); 
     return () => clearInterval(interval); 
   }, []);
 
@@ -117,8 +112,7 @@ export default function AdminDashboardPage() {
         </div>
       );
     }
-    // Only show error if stats failed *and* analytics aren't also showing an error
-    if (error && !stats && !isLoadingAnalytics) {
+    if (error && !stats) {
       return (
         <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3">
           <AlertTriangle />
@@ -144,14 +138,14 @@ export default function AdminDashboardPage() {
   };
   
   const renderAnalytics = () => {
-    if (isLoadingAnalytics && !analytics) { // Only show loader on first load
+    if (isLoadingAnalytics && !analytics) {
       return (
         <div className="flex justify-center items-center h-80 col-span-full">
           <Loader2 size={32} className="animate-spin text-[#53A4DB]" />
         </div>
       );
     }
-    if (error && !analytics) { // Show error only if initial load failed
+    if (error && !analytics) {
        return (
         <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3 mt-12">
           <AlertTriangle />
@@ -166,7 +160,7 @@ export default function AdminDashboardPage() {
           <h2 className="text-2xl font-semibold text-white mb-4 mt-12">Visitor Analytics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             <StatCard 
-              title="Live Visitors (30 sec)"
+              title="Live Visitors (5 min)"
               value={analytics.liveVisitors} 
               icon={Users} 
               color="bg-green-500/30" 
@@ -177,9 +171,9 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* --- Graphs & Lists --- */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Daily Traffic Graph */}
-            <div className="lg:col-span-2 bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+            <div className="lg:col-span-1 bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
               <h3 className="text-xl font-semibold text-white mb-4">Daily Page Views (Last 30 Days)</h3>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
@@ -198,23 +192,44 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Top Referrers */}
-            <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
-              <h3 className="text-xl font-semibold text-white mb-4">Top Referrers (30 Days)</h3>
-              <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
-                {analytics.topReferrers.length > 0 ? analytics.topReferrers.map(ref => (
-                  <div key={ref._id} className="flex justify-between items-center text-sm">
-                    <span className="text-neutral-300 truncate" title={ref._id}>{ref._id || "Direct/Unknown"}</span>
-                    <span className="font-bold text-white bg-neutral-700/50 rounded px-2 py-0.5">{ref.count}</span>
-                  </div>
-                )) : <p className="text-neutral-500">No referrer data yet.</p>}
+            {/* ✨ UPDATED: Top Sources & Referrers Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {/* Top Referrers (Domains) */}
+              <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <LinkIcon size={18} /> Top Referrers
+                </h3>
+                <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                  {analytics.topReferrers.length > 0 ? analytics.topReferrers.map(ref => (
+                    <div key={ref._id} className="flex justify-between items-center text-sm">
+                      <span className="text-neutral-300 truncate" title={ref._id}>{ref._id || "Direct/Unknown"}</span>
+                      <span className="font-bold text-white bg-neutral-700/50 rounded px-2 py-0.5">{ref.count}</span>
+                    </div>
+                  )) : <p className="text-neutral-500">No referrer data yet.</p>}
+                </div>
+              </div>
+
+              {/* ✨ NEW: Top Sources (UTM) */}
+              <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <BarChart3 size={18} /> Top Sources
+                </h3>
+                <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                  {analytics.topSources.length > 0 ? analytics.topSources.map(src => (
+                    <div key={src._id} className="flex justify-between items-center text-sm">
+                      <span className="text-neutral-300 truncate" title={src._id}>{src._id || "None"}</span>
+                      <span className="font-bold text-white bg-neutral-700/50 rounded px-2 py-0.5">{src.count}</span>
+                    </div>
+                  )) : <p className="text-neutral-500">No UTM source data yet.</p>}
+                </div>
               </div>
             </div>
+
           </div>
           
           {/* Top Pages */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
-              <h3 className="text-xl font-semibold text-white mb-4">Top Pages (30 Days)</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">Top Pages (Last 30 Days)</h3>
               <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
                 {analytics.topPages.length > 0 ? analytics.topPages.map(page => (
                   <div key={page._id} className="flex justify-between items-center text-sm">
@@ -225,19 +240,16 @@ export default function AdminDashboardPage() {
               </div>
           </div>
 
-          {/* --- ✨ NEW: Latest Activity (IP Address Log) ✨ --- */}
+          {/* Latest Activity (IP Address Log) */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Terminal size={20} />
-                Latest Activity
+                Latest Activity (Updates every 1 min)
               </h3>
               <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar font-mono text-sm">
-                {/* We use 'analytics.latestVisits' which is fetched from your API */}
                 {analytics.latestVisits.length > 0 ? analytics.latestVisits.map(visit => (
                   <div key={visit._id} className="flex flex-col sm:flex-row justify-between sm:items-center">
-                    {/* IP Address */}
                     <span className="text-neutral-300">{visit.ip}</span>
-                    {/* Page and Time */}
                     <span className="text-neutral-500">
                       visited <span className="text-cyan-400">{visit.path}</span> at {new Date(visit.timestamp).toLocaleTimeString()}
                     </span>
@@ -249,7 +261,6 @@ export default function AdminDashboardPage() {
       );
     }
     
-    // This handles the case where content stats loaded but analytics failed
     if (error && !isLoadingAnalytics) {
        return (
         <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3 mt-12">
