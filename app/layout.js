@@ -1,8 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react"; // ✨ 1. Import Suspense
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
-// import { Analytics } from "@vercel/analytics/next"; // 1. REMOVED
-import { AnalyticsTracker } from "./components/AnalyticsTracker"; // ✨ 2. Import your tracker
+import { AnalyticsTracker } from "../components/AnalyticsTracker"; 
 
 // Setup the font
 const baiJamjuree = Bai_Jamjuree({
@@ -63,8 +62,11 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${baiJamjuree.variable} no-scrollbar`}>
       <body className={`font-sans antialiased bg-black text-white`}>
         {children}
-        {/* <Analytics /> REMOVED */}
-        <AnalyticsTracker /> {/* ✨ 3. Add your tracker here */}
+        {/* ✨ 2. Wrap AnalyticsTracker in Suspense */}
+        {/* This tells Next.js to load this component dynamically */}
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
       </body>
     </html>
   );
