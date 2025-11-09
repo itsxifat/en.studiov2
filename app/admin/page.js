@@ -8,106 +8,20 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
-// --- NEW: Import for the map ---
-import {
-  ZoomableGroup,
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker
-} from "@vnedyalk0v/react19-simple-maps";
+import dynamic from 'next/dynamic'; // --- 1. IMPORT dynamic ---
 
-// --- NEW: Map Component ---
-// This is the TopoJSON file for the world map
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-
-/**
- * Renders a live visitor map.
- * Assumes 'visits' is an array of objects, where each object has:
- * - _id: string
- * - coordinates: [number, number] (e.g., [longitude, latitude])
- * - location: string (e.g., "City, Country")
- * - ip: string
- */
-const LiveVisitorMap = ({ visits = [] }) => {
-  // Filter visits that have valid coordinate data from the backend
-  const markers = visits
-    .filter(v => v.coordinates && v.coordinates.length === 2)
-    .map(v => ({
-      _id: v._id,
-      name: v.location || v.ip, // Show location if available, fallback to IP
-      coordinates: v.coordinates, // [lng, lat]
-    }));
-
-  return (
-    <div className="bg-neutral-900 border border-neutral-800 p-2 sm:p-4 rounded-xl h-[300px] md:h-[500px]">
-      <ComposableMap
-        projection="geoMercator"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <ZoomableGroup center={[0, 0]} zoom={1}>
-          <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map(geo => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#334155" // Dark land color
-                  stroke="#171717" // Darker border
-                  style={{
-                    default: { outline: "none" },
-                    hover: { outline: "none", fill: "#475569" },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              ))
-            }
-          </Geographies>
-          {/* Map over markers from visits */}
-          {markers.map(({ _id, name, coordinates }) => (
-            <Marker key={_id} coordinates={coordinates}>
-              {/* Pulsing dot for live feel */}
-              <g
-                fill="none"
-                stroke="#00FFFF"
-                strokeWidth="2"
-              >
-                <circle r="4" stroke="#00FFFF" fill="#00FFFF" />
-                <circle r="4">
-                   <animate
-                    attributeName="r"
-                    from="4"
-                    to="12"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                    keyTimes="0; 1"
-                    keySplines="0.165, 0.84, 0.44, 1"
-                    values="4; 12"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    from="1"
-                    to="0"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                    keyTimes="0; 1"
-                    keySplines="0.3, 0.61, 0.355, 1"
-                    values="1; 0"
-                  />
-                </circle>
-              </g>
-              {/* Basic tooltip on hover */}
-              <title>{name}</title>
-            </Marker>
-          ))}
-        </ZoomableGroup>
-      </ComposableMap>
-    </div>
-  );
-};
-
+// --- 2. DYNAMICALLY import the new Leaflet map component ---
+const LiveVisitorMap = dynamic(
+  () => import('./LiveVisitorMap'), // Path to your new component
+  { 
+    ssr: false, // This is essential for Leaflet
+    loading: () => (
+      <div className="flex justify-center items-center h-[300px] md:h-[500px] bg-neutral-900 border border-neutral-800 rounded-xl">
+        <Loader2 size={32} className="animate-spin text-[#53A4DB]" />
+      </div>
+    )
+  } 
+);
 
 // Stat Card Component (No changes)
 const StatCard = ({ title, value, icon: Icon, color, isLive = false }) => (
@@ -140,9 +54,8 @@ export default function AdminDashboardPage() {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- UPDATED Fetcher for content stats ---
+  // --- Fetcher for content stats (No changes) ---
   const fetchContentStats = async (isInitialLoad = false) => {
-    // Only show full loader on initial fetch
     if (isInitialLoad) {
       setIsLoadingContent(true);
     }
@@ -151,14 +64,12 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setStats(data.data);
-        // Clear previous errors if successful
         if (error) setError(null);
       } else {
         throw new Error(data.error || 'Failed to fetch content stats.');
       }
     } catch (err) {
       console.error(err.message);
-      // Only set main error if it's the initial load
       if (isInitialLoad) {
         setError(err.message);
       }
@@ -169,9 +80,8 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --- UPDATED Fetcher for all analytics data ---
+  // --- Fetcher for all analytics data (No changes) ---
   const fetchAnalytics = async (isInitialLoad = false) => {
-    // Only show full loader on initial fetch
     if (isInitialLoad) {
       setIsLoadingAnalytics(true);
     }
@@ -180,14 +90,12 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setAnalytics(data.data);
-        // Clear previous errors if successful
         if (error) setError(null);
       } else {
         throw new Error(data.error || 'Failed to fetch analytics.');
       }
     } catch (err) {
       console.error(err.message);
-      // Only set main error if it's the initial load
       if (isInitialLoad) {
         setError(err.message);
       }
@@ -197,21 +105,21 @@ export default function AdminDashboardPage() {
       }
     }
   };
-
-  // --- UPDATED useEffect ---
+  
+  // --- useEffect (UPDATED) ---
   useEffect(() => {
-    // Run initial fetches
     fetchContentStats(true);
     fetchAnalytics(true);
-
-    // Poll every 30 seconds
+    
+    // --- UPDATED interval to 20 seconds ---
     const interval = setInterval(() => {
-      fetchContentStats(false); // 'false' means it's a poll, not initial load
-      fetchAnalytics(false);  // 'false' means it's a poll, not initial load
-    }, 30000); // 30000 ms = 30 seconds
+      fetchContentStats(false);
+      fetchAnalytics(false);
+    }, 20000); // 20000 ms = 20 seconds
+    // --- END UPDATE ---
 
     return () => clearInterval(interval);
-  }, []); // Empty dependency array ensures this runs only on mount/unmount
+  }, []);
 
   // --- renderContentStats (No changes) ---
   const renderContentStats = () => {
@@ -246,7 +154,7 @@ export default function AdminDashboardPage() {
     }
     return null;
   };
-
+  
   // --- renderAnalytics (UPDATED) ---
   const renderAnalytics = () => {
     if (isLoadingAnalytics && !analytics) {
@@ -256,7 +164,6 @@ export default function AdminDashboardPage() {
         </div>
       );
     }
-    // This check is important: show error only if data hasn't loaded at all
     if (error && !analytics) {
       return (
         <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3 mt-12">
@@ -282,14 +189,11 @@ export default function AdminDashboardPage() {
             <StatCard title="All-Time Uniques" value={analytics.allTimeUniques} icon={Users} color="bg-blue-500/30" />
           </div>
 
-          {/* --- NEW: Live Visitor Map --- */}
+          {/* --- Live Visitor Map (This will now use the dynamic component) --- */}
           <h2 className="text-2xl font-semibold text-white mb-4 mt-12">Live Visitor Map</h2>
-          {/* NOTE: This map requires your API to send 'coordinates: [lng, lat]' 
-            for each visit in 'analytics.latestVisits'
-          */}
           <LiveVisitorMap visits={analytics.latestVisits || []} />
 
-          {/* --- Graphs & Lists (Added mt-12 for spacing) --- */}
+          {/* --- Graphs & Lists (No changes) --- */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
             {/* Daily Traffic Graph */}
             <div className="lg:col-span-1 bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
@@ -343,10 +247,9 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
-
           </div>
-
-          {/* Top Pages */}
+          
+          {/* Top Pages (No changes) */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
             <h3 className="text-xl font-semibold text-white mb-4">Top Pages (Last 30 Days)</h3>
             <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
@@ -359,37 +262,30 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Latest Activity (IP Address Log) */}
+          {/* Latest Activity (UPDATED) */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Terminal size={20} />
-              {/* Updated title to reflect polling interval */}
-              Latest Activity (Updates every 30 sec)
+              {/* --- UPDATED title to 20 sec --- */}
+              Latest Activity (Updates every 20 sec) 
             </h3>
             <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar font-mono text-sm">
               {analytics.latestVisits.length > 0 ? analytics.latestVisits.map(visit => (
-                // --- MODIFIED: Added visit.location ---
                 <div key={visit._id} className="flex flex-col sm:flex-row justify-between sm:items-center">
                   <div>
                     <span className="text-neutral-300">{visit.ip}</span>
-                    {/* NOTE: This requires your API to send 'visit.location'
-                      (e.g., "Savar, Bangladesh") 
-                    */}
                     <span className="text-neutral-500 ml-2">{visit.location || 'Unknown Location'}</span>
                   </div>
                   <span className="text-neutral-500 text-xs sm:text-sm">
                     visited <span className="text-cyan-400">{visit.path}</span> at {new Date(visit.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
-                // --- END MODIFICATION ---
               )) : <p className="text-neutral-500">No visits recorded yet.</p>}
             </div>
           </div>
         </>
       );
     }
-
-    // Fallback in case analytics is null but not loading (e.g., after an error)
     return null;
   };
 
@@ -408,15 +304,13 @@ export default function AdminDashboardPage() {
           Welcome to the En.Studio admin panel.
         </p>
 
-        {/* --- Content Stats (From our own API) --- */}
         <h2 className="text-2xl font-semibold text-white mb-4">Content at a Glance</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {renderContentStats()}
         </div>
-
-        {/* --- Analytics Section (From our own API) --- */}
+        
         {renderAnalytics()}
-
+        
       </motion.div>
     </div>
   );

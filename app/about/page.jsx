@@ -124,7 +124,7 @@ export default function AboutPage() {
 
       {/* --- Our Expertise Section --- */}
       <motion.section 
-        className="py-16 md:py-24 bg-neutral-900 border-y border-neutral-800"
+        className="py-16 md:py-24 bg-black border-y border-black"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.3 }}
@@ -190,7 +190,7 @@ export default function AboutPage() {
             </p>
           </motion.div>
           {/* With Model */}
-          <motion.div variants={itemVariants} className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-lg">
+          <motion.div variants={itemVariants} className="bg-black border border-neutral-800 p-8 rounded-lg">
             <h3 className="text-2xl font-bold text-white mb-3">Lifestyle & Narrative</h3>
             <p className="text-neutral-300 font-body">
               For lifestyle campaigns, TVCs, and narrative work, we provide full-service production, 
@@ -201,7 +201,7 @@ export default function AboutPage() {
       </motion.section>
 
       {/* --- Call to Action Section --- */}
-      <section className="py-16 md:py-24 bg-neutral-900 border-t border-neutral-800">
+      <section className="py-16 md:py-24 bg-black border-t border-black">
         <motion.div 
           className="container mx-auto px-4 sm:px-8 max-w-4xl text-center"
           initial={{ opacity: 0 }}
@@ -239,7 +239,7 @@ export default function AboutPage() {
 const ExpertiseCard = ({ icon, title, description }) => (
   <motion.div 
     variants={itemVariants}
-    className="border border-neutral-800 bg-neutral-900/50 p-6 rounded-lg"
+    className="border border-black bg-neutral-800 p-6 rounded-lg"
   >
     <div className="mb-4">{icon}</div>
     <h3 className="text-xl font-bold text-white mb-2 font-heading">{title}</h3>
