@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
           <h2 className="text-2xl font-semibold text-white mb-4 mt-12">Visitor Analytics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             <StatCard 
-              title="Live Visitors (5 min)"
+              title="Live Visitors (20sec)"
               value={analytics.liveVisitors} 
               icon={Users} 
               color="bg-green-500/30" 
