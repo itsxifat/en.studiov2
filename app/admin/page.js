@@ -244,7 +244,7 @@ export default function AdminDashboardPage() {
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Terminal size={20} />
-                Latest Activity (Updates every 30 sec)
+                Latest Activity (Updates every 20 sec)
               </h3>
               <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar font-mono text-sm">
                 {analytics.latestVisits.length > 0 ? analytics.latestVisits.map(visit => (
