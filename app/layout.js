@@ -1,7 +1,7 @@
 import React, { Suspense } from "react"; // ✨ 1. Import Suspense
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
-import { AnalyticsTracker } from "../components/AnalyticsTracker"; 
+import { AnalyticsTracker } from "./components/AnalyticsTracker"; 
 
 // Setup the font
 const baiJamjuree = Bai_Jamjuree({
