@@ -2,16 +2,17 @@ import React from "react";
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
 // import { Analytics } from "@vercel/analytics/next"; // 1. REMOVED
-import { AnalyticsTracker } from "./components/AnalyticsTracker"; // 2. IMPORT your tracker
+import { AnalyticsTracker } from "../components/AnalyticsTracker"; // ✨ 2. Import your tracker
 
+// Setup the font
 const baiJamjuree = Bai_Jamjuree({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-bai-jamjuree",
 });
 
+// --- SEO Metadata (Same as before) ---
 export const metadata = {
-  // ... (Your full metadata object from the previous step) ...
   title: {
     default: "Enfinito Studio - Professional Video & Photo Production",
     template: "%s | Enfinito Studio",
@@ -54,13 +55,15 @@ export const metadata = {
     images: ["https://res.cloudinary.com/dagmsvwui/image/upload/v1762236962/Post_01_1_ze4atm.png"],
   },
 };
+// --- End of Metadata ---
+
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${baiJamjuree.variable} no-scrollbar`}>
       <body className={`font-sans antialiased bg-black text-white`}>
         {children}
-        {/* <Analytics />  REMOVED */}
+        {/* <Analytics /> REMOVED */}
         <AnalyticsTracker /> {/* ✨ 3. Add your tracker here */}
       </body>
     </html>
