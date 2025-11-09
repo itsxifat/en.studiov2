@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import dbConnect from '../../lib/dbConnect';
 import Visit from '../../models/visit';
-import { headers } from 'next/headers';
 
 // This API route is fast and logs visits in the background
 export async function POST(request) {

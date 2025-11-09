@@ -1,24 +1,20 @@
 import mongoose from 'mongoose';
 
 const VisitSchema = new mongoose.Schema({
-  // The page that was visited (e.g., /about, /portfolio/project-slug)
   path: {
     type: String,
     required: true,
     trim: true,
     index: true,
   },
-  // ✨ Storing the raw IP as requested
   ip: {
     type: String,
     required: true,
     index: true,
   },
-  // The full User-Agent string
   userAgent: {
     type: String,
   },
-  // The referring site (e.g., google.com, facebook.com)
   referrer: {
     type: String,
     trim: true,
@@ -29,13 +25,23 @@ const VisitSchema = new mongoose.Schema({
     trim: true,
     index: true,
   },
-  // Timestamp of the visit
+  
+  // --- NEW: Added fields for GeoIP data ---
+  location: {
+    type: String, // e.g., "Savar, Bangladesh"
+    trim: true,
+  },
+  coordinates: {
+    type: [Number], // Stored as [longitude, latitude]
+    index: '2dsphere', // For geospatial queries
+  },
+  // --- END NEW FIELDS ---
+
   timestamp: {
     type: Date,
     default: Date.now,
-    // Automatically delete records after 90 days
-    expires: '90d', 
+    expires: '90d',
   },
-}, { timestamps: false }); // We use our own timestamp
+}, { timestamps: false });
 
 export default mongoose.models.Visit || mongoose.model('Visit', VisitSchema);

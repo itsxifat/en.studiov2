@@ -1,15 +1,115 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  LayoutDashboard, Video, Camera, MessageSquareText, Layers, Loader2, 
+import {
+  LayoutDashboard, Video, Camera, MessageSquareText, Layers, Loader2,
   AlertTriangle, BarChart3, Package, Clapperboard, FolderHeart, Users, Eye,
   List, Terminal, Link as LinkIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+// --- NEW: Import for the map ---
+import {
+  ZoomableGroup,
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker
+} from "@vnedyalk0v/react19-simple-maps";
 
-// Stat Card Component
+// --- NEW: Map Component ---
+// This is the TopoJSON file for the world map
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+/**
+ * Renders a live visitor map.
+ * Assumes 'visits' is an array of objects, where each object has:
+ * - _id: string
+ * - coordinates: [number, number] (e.g., [longitude, latitude])
+ * - location: string (e.g., "City, Country")
+ * - ip: string
+ */
+const LiveVisitorMap = ({ visits = [] }) => {
+  // Filter visits that have valid coordinate data from the backend
+  const markers = visits
+    .filter(v => v.coordinates && v.coordinates.length === 2)
+    .map(v => ({
+      _id: v._id,
+      name: v.location || v.ip, // Show location if available, fallback to IP
+      coordinates: v.coordinates, // [lng, lat]
+    }));
+
+  return (
+    <div className="bg-neutral-900 border border-neutral-800 p-2 sm:p-4 rounded-xl h-[300px] md:h-[500px]">
+      <ComposableMap
+        projection="geoMercator"
+        style={{ width: "100%", height: "100%" }}
+      >
+        <ZoomableGroup center={[0, 0]} zoom={1}>
+          <Geographies geography={geoUrl}>
+            {({ geographies }) =>
+              geographies.map(geo => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#334155" // Dark land color
+                  stroke="#171717" // Darker border
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none", fill: "#475569" },
+                    pressed: { outline: "none" },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+          {/* Map over markers from visits */}
+          {markers.map(({ _id, name, coordinates }) => (
+            <Marker key={_id} coordinates={coordinates}>
+              {/* Pulsing dot for live feel */}
+              <g
+                fill="none"
+                stroke="#00FFFF"
+                strokeWidth="2"
+              >
+                <circle r="4" stroke="#00FFFF" fill="#00FFFF" />
+                <circle r="4">
+                   <animate
+                    attributeName="r"
+                    from="4"
+                    to="12"
+                    dur="1.5s"
+                    begin="0s"
+                    repeatCount="indefinite"
+                    keyTimes="0; 1"
+                    keySplines="0.165, 0.84, 0.44, 1"
+                    values="4; 12"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    from="1"
+                    to="0"
+                    dur="1.5s"
+                    begin="0s"
+                    repeatCount="indefinite"
+                    keyTimes="0; 1"
+                    keySplines="0.3, 0.61, 0.355, 1"
+                    values="1; 0"
+                  />
+                </circle>
+              </g>
+              {/* Basic tooltip on hover */}
+              <title>{name}</title>
+            </Marker>
+          ))}
+        </ZoomableGroup>
+      </ComposableMap>
+    </div>
+  );
+};
+
+
+// Stat Card Component (No changes)
 const StatCard = ({ title, value, icon: Icon, color, isLive = false }) => (
   <div className="bg-neutral-900 border border-neutral-800 p-5 rounded-xl flex items-center gap-4">
     <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${color}`}>
@@ -40,26 +140,39 @@ export default function AdminDashboardPage() {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetcher for content stats
-  const fetchContentStats = async () => {
+  // --- UPDATED Fetcher for content stats ---
+  const fetchContentStats = async (isInitialLoad = false) => {
+    // Only show full loader on initial fetch
+    if (isInitialLoad) {
+      setIsLoadingContent(true);
+    }
     try {
       const res = await fetch('/api/admin/dashboard-stats');
       const data = await res.json();
       if (res.ok && data.success) {
         setStats(data.data);
+        // Clear previous errors if successful
+        if (error) setError(null);
       } else {
         throw new Error(data.error || 'Failed to fetch content stats.');
       }
     } catch (err) {
-      setError(err.message);
+      console.error(err.message);
+      // Only set main error if it's the initial load
+      if (isInitialLoad) {
+        setError(err.message);
+      }
     } finally {
-      setIsLoadingContent(false);
+      if (isInitialLoad) {
+        setIsLoadingContent(false);
+      }
     }
   };
 
-  // Fetcher for all analytics data
-  const fetchAnalytics = async () => {
-    if (!analytics) {
+  // --- UPDATED Fetcher for all analytics data ---
+  const fetchAnalytics = async (isInitialLoad = false) => {
+    // Only show full loader on initial fetch
+    if (isInitialLoad) {
       setIsLoadingAnalytics(true);
     }
     try {
@@ -67,43 +180,40 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setAnalytics(data.data);
+        // Clear previous errors if successful
+        if (error) setError(null);
       } else {
         throw new Error(data.error || 'Failed to fetch analytics.');
       }
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoadingAnalytics(false);
-    }
-  };
-  
-  // Fetcher for "live" data only (for polling)
-  const fetchLiveData = async () => {
-     try {
-      const res = await fetch('/api/admin/analytics');
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setAnalytics(prev => ({
-          ...(prev || data.data),
-          liveVisitors: data.data.liveVisitors,
-          latestVisits: data.data.latestVisits,
-        }));
-      } else {
-        throw new Error(data.error || 'Failed to fetch live data.');
-      }
-    } catch (err) {
       console.error(err.message);
+      // Only set main error if it's the initial load
+      if (isInitialLoad) {
+        setError(err.message);
+      }
+    } finally {
+      if (isInitialLoad) {
+        setIsLoadingAnalytics(false);
+      }
     }
   };
 
+  // --- UPDATED useEffect ---
   useEffect(() => {
-    fetchContentStats();
-    fetchAnalytics();
-    // Poll every 1 minute
-    const interval = setInterval(fetchLiveData, 30000); 
-    return () => clearInterval(interval); 
-  }, []);
+    // Run initial fetches
+    fetchContentStats(true);
+    fetchAnalytics(true);
 
+    // Poll every 30 seconds
+    const interval = setInterval(() => {
+      fetchContentStats(false); // 'false' means it's a poll, not initial load
+      fetchAnalytics(false);  // 'false' means it's a poll, not initial load
+    }, 30000); // 30000 ms = 30 seconds
+
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array ensures this runs only on mount/unmount
+
+  // --- renderContentStats (No changes) ---
   const renderContentStats = () => {
     if (isLoadingContent) {
       return (
@@ -136,7 +246,8 @@ export default function AdminDashboardPage() {
     }
     return null;
   };
-  
+
+  // --- renderAnalytics (UPDATED) ---
   const renderAnalytics = () => {
     if (isLoadingAnalytics && !analytics) {
       return (
@@ -145,8 +256,9 @@ export default function AdminDashboardPage() {
         </div>
       );
     }
+    // This check is important: show error only if data hasn't loaded at all
     if (error && !analytics) {
-       return (
+      return (
         <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3 mt-12">
           <AlertTriangle />
           <p><strong>Error loading analytics data:</strong> {error}</p>
@@ -159,19 +271,26 @@ export default function AdminDashboardPage() {
           {/* --- Live Stats --- */}
           <h2 className="text-2xl font-semibold text-white mb-4 mt-12">Visitor Analytics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <StatCard 
-              title="Live Visitors (20sec)"
-              value={analytics.liveVisitors} 
-              icon={Users} 
-              color="bg-green-500/30" 
-              isLive={true} 
+            <StatCard
+              title="Live Visitors (5 min)"
+              value={analytics.liveVisitors}
+              icon={Users}
+              color="bg-green-500/30"
+              isLive={true}
             />
             <StatCard title="All-Time Views" value={analytics.allTimeViews} icon={Eye} color="bg-blue-500/30" />
             <StatCard title="All-Time Uniques" value={analytics.allTimeUniques} icon={Users} color="bg-blue-500/30" />
           </div>
 
-          {/* --- Graphs & Lists --- */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* --- NEW: Live Visitor Map --- */}
+          <h2 className="text-2xl font-semibold text-white mb-4 mt-12">Live Visitor Map</h2>
+          {/* NOTE: This map requires your API to send 'coordinates: [lng, lat]' 
+            for each visit in 'analytics.latestVisits'
+          */}
+          <LiveVisitorMap visits={analytics.latestVisits || []} />
+
+          {/* --- Graphs & Lists (Added mt-12 for spacing) --- */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
             {/* Daily Traffic Graph */}
             <div className="lg:col-span-1 bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
               <h3 className="text-xl font-semibold text-white mb-4">Daily Page Views (Last 30 Days)</h3>
@@ -192,7 +311,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* ✨ UPDATED: Top Sources & Referrers Grid */}
+            {/* Top Sources & Referrers Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* Top Referrers (Domains) */}
               <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
@@ -209,7 +328,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* ✨ NEW: Top Sources (UTM) */}
+              {/* Top Sources (UTM) */}
               <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                   <BarChart3 size={18} /> Top Sources
@@ -226,52 +345,55 @@ export default function AdminDashboardPage() {
             </div>
 
           </div>
-          
+
           {/* Top Pages */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
-              <h3 className="text-xl font-semibold text-white mb-4">Top Pages (Last 30 Days)</h3>
-              <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
-                {analytics.topPages.length > 0 ? analytics.topPages.map(page => (
-                  <div key={page._id} className="flex justify-between items-center text-sm">
-                    <span className="text-neutral-300 truncate" title={page._id}>{page._id}</span>
-                    <span className="font-bold text-white bg-neutral-700/50 rounded px-2 py-0.5">{page.count}</span>
-                  </div>
-                )) : <p className="text-neutral-500">No page data yet.</p>}
-              </div>
+            <h3 className="text-xl font-semibold text-white mb-4">Top Pages (Last 30 Days)</h3>
+            <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+              {analytics.topPages.length > 0 ? analytics.topPages.map(page => (
+                <div key={page._id} className="flex justify-between items-center text-sm">
+                  <span className="text-neutral-300 truncate" title={page._id}>{page._id}</span>
+                  <span className="font-bold text-white bg-neutral-700/50 rounded px-2 py-0.5">{page.count}</span>
+                </div>
+              )) : <p className="text-neutral-500">No page data yet.</p>}
+            </div>
           </div>
 
           {/* Latest Activity (IP Address Log) */}
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mt-8">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Terminal size={20} />
-                Latest Activity (Updates every 20 sec)
-              </h3>
-              <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar font-mono text-sm">
-                {analytics.latestVisits.length > 0 ? analytics.latestVisits.map(visit => (
-                  <div key={visit._id} className="flex flex-col sm:flex-row justify-between sm:items-center">
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Terminal size={20} />
+              {/* Updated title to reflect polling interval */}
+              Latest Activity (Updates every 30 sec)
+            </h3>
+            <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar font-mono text-sm">
+              {analytics.latestVisits.length > 0 ? analytics.latestVisits.map(visit => (
+                // --- MODIFIED: Added visit.location ---
+                <div key={visit._id} className="flex flex-col sm:flex-row justify-between sm:items-center">
+                  <div>
                     <span className="text-neutral-300">{visit.ip}</span>
-                    <span className="text-neutral-500">
-                      visited <span className="text-cyan-400">{visit.path}</span> at {new Date(visit.timestamp).toLocaleTimeString()}
-                    </span>
+                    {/* NOTE: This requires your API to send 'visit.location'
+                      (e.g., "Savar, Bangladesh") 
+                    */}
+                    <span className="text-neutral-500 ml-2">{visit.location || 'Unknown Location'}</span>
                   </div>
-                )) : <p className="text-neutral-500">No visits recorded yet.</p>}
-              </div>
+                  <span className="text-neutral-500 text-xs sm:text-sm">
+                    visited <span className="text-cyan-400">{visit.path}</span> at {new Date(visit.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+                // --- END MODIFICATION ---
+              )) : <p className="text-neutral-500">No visits recorded yet.</p>}
+            </div>
           </div>
         </>
       );
     }
-    
-    if (error && !isLoadingAnalytics) {
-       return (
-        <div className="col-span-full bg-red-900/50 border border-red-700 text-red-300 p-4 rounded-lg flex items-center gap-3 mt-12">
-          <AlertTriangle />
-          <p><strong>Error loading analytics data:</strong> {error}</p>
-        </div>
-      );
-    }
+
+    // Fallback in case analytics is null but not loading (e.g., after an error)
     return null;
   };
 
+  // --- Main return (No changes) ---
   return (
     <div className="max-w-7xl mx-auto">
       <motion.div
@@ -291,10 +413,10 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {renderContentStats()}
         </div>
-        
+
         {/* --- Analytics Section (From our own API) --- */}
         {renderAnalytics()}
-        
+
       </motion.div>
     </div>
   );

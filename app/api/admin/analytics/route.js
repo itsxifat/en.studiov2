@@ -12,11 +12,11 @@ export async function GET() {
       liveVisitorsDocs,
       topPages,
       topReferrers,
-      topSources, // ✨ NEW: Get top UTM sources
+      topSources,
       dailyTraffic,
       totalViews,
       totalUniquesDocs,
-      latestVisits
+      latestVisits // CHANGED: This is the query we are updating
     ] = await Promise.all([
       // 1. "Live" Visitors (Unique raw IPs in last 5 mins)
       Visit.distinct('ip', { timestamp: { $gt: fiveMinutesAgo } }).exec(),
@@ -37,7 +37,7 @@ export async function GET() {
         { $limit: 10 }
       ]).exec(),
 
-      // ✨ 4. Top Sources (UTM parameters)
+      // 4. Top Sources (UTM parameters)
       Visit.aggregate([
         { $match: { timestamp: { $gt: thirtyDaysAgo }, source: { $ne: null } } },
         { $group: { _id: '$source', count: { $sum: 1 } } },
@@ -63,13 +63,15 @@ export async function GET() {
       // 7. All-Time Unique Visitors (by raw IP)
       Visit.distinct('ip').exec(),
       
-      // 8. Get the 10 most recent visits to show IPs
+      // --- QUERY 8: UPDATED ---
+      // Get the 50 most recent visits for the scrollable log
       Visit.find({})
         .sort({ timestamp: -1 })
-        .limit(10)
-        .select('ip path timestamp')
+        .limit(50) // CHANGED: Increased from 10 to 50 for the scrollable list
+        .select('ip path timestamp location coordinates') // CHANGED: Added location and coordinates
         .lean()
         .exec()
+      // --- END UPDATE ---
     ]);
     
     const liveVisitorsCount = liveVisitorsDocs.length;
@@ -86,11 +88,11 @@ export async function GET() {
         liveVisitors: liveVisitorsCount,
         topPages,
         topReferrers,
-        topSources, // ✨ Send new data
+        topSources,
         dailyTraffic: formattedDailyTraffic,
         allTimeViews: totalViews,
         allTimeUniques: totalUniques,
-        latestVisits: latestVisits
+        latestVisits: latestVisits // This will now contain location and coordinates
       } 
     });
 
