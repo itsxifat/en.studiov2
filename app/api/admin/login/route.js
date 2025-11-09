@@ -1,3 +1,5 @@
+export const runtime = 'nodejs' // IMPORTANT for jose stability
+
 import { SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -9,39 +11,39 @@ export async function POST(request) {
     const adminPassword = process.env.ADMIN_PASSWORD;
     const jwtSecret = process.env.JWT_SECRET_KEY;
 
-    // This check is what is failing
+    // Must exist in .env
     if (!adminPassword || !jwtSecret) {
       throw new Error('Server environment is not configured for auth.');
     }
 
-    // 1. Check if the password is correct
+    // Validate password
     if (password !== adminPassword) {
       return NextResponse.json({ success: false, error: 'Invalid password.' }, { status: 401 });
     }
 
-    // 2. Create a session payload
+    // Payload
     const payload = { isAdmin: true, sub: 'admin' };
-    
-    // 3. Create a secure JWT (session token)
+
+    // Generate token
     const secret = new TextEncoder().encode(jwtSecret);
     const token = await new SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('1d') // Session lasts for 1 day
+      .setExpirationTime('1d')
       .sign(secret);
 
-    // 4. Set the token in a secure, HttpOnly cookie
+    // Set cookie
     cookies().set('admin-session', token, {
-      httpOnly: true, // Prevents client-side JS from reading it
-      secure: process.env.NODE_ENV === 'production', // Use 'secure' in production
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 60 * 60 * 24, // 1 day in seconds
+      maxAge: 60 * 60 * 24
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
 
   } catch (error) {
-    console.error('Login API Error:', error.message);
+    console.error('Login API Error:', error);
     return NextResponse.json({ success: false, error: error.message || 'An error occurred.' }, { status: 500 });
   }
 }
