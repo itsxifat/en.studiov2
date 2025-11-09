@@ -2,7 +2,7 @@ import React from "react";
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
 // import { Analytics } from "@vercel/analytics/next"; // 1. REMOVED
-import { AnalyticsTracker } from "../components/AnalyticsTracker"; // ✨ 2. Import your tracker
+import { AnalyticsTracker } from "./components/AnalyticsTracker"; // ✨ 2. Import your tracker
 
 // Setup the font
 const baiJamjuree = Bai_Jamjuree({
