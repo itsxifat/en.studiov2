@@ -16,6 +16,29 @@ const nextConfig = {
       },
     ],
   },
+
+  // ✅ Optional: Improves IP and proxy header behavior (for your tracking API)
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          // These help ensure the client’s real IP is forwarded through proxies
+          { key: "X-Forwarded-For", value: "{ip}" },
+          { key: "X-Real-IP", value: "{ip}" },
+        ],
+      },
+    ];
+  },
+
+  // ✅ Optional: Recommended for better edge/runtime behavior
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb", // increase if you upload data
+    },
+  },
+
+  reactStrictMode: true,
 };
 
 export default nextConfig;

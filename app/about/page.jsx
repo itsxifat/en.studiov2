@@ -48,7 +48,7 @@ const AboutHeader = () => {
         whileTap={{ scale: 0.95 }}
         className="absolute top-6 left-4 sm:top-8 sm:left-8 z-20 inline-flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-md p-2.5 text-neutral-300 border border-neutral-700/50 transition-all 
                    hover:bg-neutral-800/80 hover:text-white 
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[#53A4DB]"
         aria-label="Go back"
       >
         <ArrowLeft size={20} strokeWidth={2.5} />
@@ -60,7 +60,7 @@ const AboutHeader = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-          className="text-base font-semibold text-cyan-400 uppercase tracking-wider"
+          className="text-base font-semibold text-[#53A4DB] uppercase tracking-wider"
         >
           Our Story
         </motion.p>
@@ -108,7 +108,7 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4 text-neutral-300 font-body text-lg">
               <p>
-                <strong>En.Studio</strong> is a proud sister concern of <span className="text-cyan-400 font-semibold">Enfinito</span>, 
+                <strong>En.Studio</strong> is a proud sister concern of <span className="text-[#53A4DB] font-semibold">Enfinito</span>, 
                 born from a shared passion for cinematic storytelling and visual excellence. 
                 We believe that every brand has a unique story to tell, and our mission is to tell it beautifully.
               </p>
@@ -140,25 +140,25 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Videography Card */}
             <ExpertiseCard 
-              icon={<Video size={28} className="text-cyan-400" />}
+              icon={<Video size={28} className="text-[#53A4DB]" />}
               title="Professional Videography"
               description="Full-scale video production, from concept to final cut, for films, events, and brand stories."
             />
             {/* Photography Card */}
             <ExpertiseCard 
-              icon={<Camera size={28} className="text-cyan-400" />}
+              icon={<Camera size={28} className="text-[#53A4DB]" />}
               title="Commercial Photography"
               description="High-end product, lifestyle, and corporate photography that elevates your brand image."
             />
             {/* TVC Card */}
             <ExpertiseCard 
-              icon={<MonitorPlay size={28} className="text-cyan-400" />}
+              icon={<MonitorPlay size={28} className="text-[#53A4DB]" />}
               title="TVC Production"
               description="Broadcast-quality Television Commercials designed for maximum impact and reach."
             />
             {/* OVC Card */}
             <ExpertiseCard 
-              icon={<MousePointerClick size={28} className="text-cyan-400" />}
+              icon={<MousePointerClick size={28} className="text-[#53A4DB" />}
               title="OVC & Digital Content"
               description="Engaging Online Video Commercials (OVC) and social content tailored for the digital age."
             />

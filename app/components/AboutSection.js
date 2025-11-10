@@ -14,7 +14,7 @@ const itemVariants = {
 const AboutSection = () => {
   return (
     <motion.section 
-      className="py-20 md:py-32 bg-black border-y border-neutral-800"
+      className="py-20 md:py-32 bg-black border-y border-black"
       id="about" // Add an ID for potential nav linking
       initial="hidden"
       whileInView="visible"
@@ -45,7 +45,7 @@ const AboutSection = () => {
             </h2>
             <div className="space-y-4 text-neutral-300 font-body text-lg">
               <p>
-                <strong>En.Studio</strong> is a proud sister concern of <span className="text-cyan-400 font-semibold">Enfinito</span>, 
+                <strong>En.Studio</strong> is a proud sister concern of <span className="text-[#53A4DB] font-semibold">Enfinito</span>, 
                 born from a shared passion for cinematic storytelling and visual excellence. 
               </p>
               <p>
