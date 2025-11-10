@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 
-// Fix for marker icons in Next.js
+// Fix for broken marker icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -19,27 +19,41 @@ export default function LiveVisitorMap() {
   const socketRef = useRef(null);
 
   useEffect(() => {
+    // Ensure server-side socket is initialized
+    fetch("/api/live");
+
     const socket = io({
       path: "/api/live/socket",
       transports: ["websocket"],
     });
     socketRef.current = socket;
 
-    // Get client IP + geo data
+    // Fetch client IP + geo data
     fetch("https://ipwho.is/")
       .then((res) => res.json())
       .then((data) => {
-        if (!data.success) return;
-        const userData = {
-          ip: data.ip,
-          location: data.city ? `${data.city}, ${data.country}` : data.country,
-          coordinates: [data.latitude, data.longitude],
-        };
-        socket.emit("join", userData);
-      });
+        if (!data.success) {
+          console.warn("Geo API failed:", data.message);
+          return;
+        }
+
+        // Ensure valid coords
+        if (data.latitude && data.longitude) {
+          const userData = {
+            ip: data.ip,
+            location: data.city
+              ? `${data.city}, ${data.country}`
+              : data.country,
+            coordinates: [data.longitude, data.latitude], // [lng, lat]
+          };
+          socket.emit("join", userData);
+        }
+      })
+      .catch((err) => console.error("Geo fetch error:", err));
 
     // Receive visitor updates
     socket.on("visitors", (list) => {
+      console.log("🔵 Live visitors:", list);
       setVisitors(list);
     });
 
@@ -48,12 +62,12 @@ export default function LiveVisitorMap() {
     };
   }, []);
 
-  // Convert visitor data into Leaflet markers
+  // Convert visitor data into Leaflet markers (flip coords → [lat, lng])
   const markers = visitors
-    .filter((v) => v.coordinates?.length === 2)
+    .filter((v) => Array.isArray(v.coordinates) && v.coordinates.length === 2)
     .map((v, i) => ({
       id: i,
-      position: [v.coordinates[0], v.coordinates[1]],
+      position: [v.coordinates[1], v.coordinates[0]], // ✅ flip [lng, lat] → [lat, lng]
       name: v.location || v.ip,
     }));
 

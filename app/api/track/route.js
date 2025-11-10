@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import dbConnect from '../../lib/dbConnect';
 import Visit from '../../models/visit';
 
@@ -12,20 +11,23 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Path is required.' }, { status: 400 });
     }
 
-    const headersList = headers();
+    // ✅ MUST await headers() in Next.js 15+
+    const headersList = await request.headers;
+    const forwardedFor = headersList.get('x-forwarded-for');
+    const realIp = headersList.get('x-real-ip');
+    const cfIp = headersList.get('cf-connecting-ip');
 
-    // ✅ Improved IP detection (covers Vercel, Cloudflare, proxies, etc.)
+    // ✅ Detect IP safely
     const ip =
-      headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      headersList.get('x-real-ip') ||
-      headersList.get('cf-connecting-ip') ||
+      forwardedFor?.split(',')[0]?.trim() ||
+      realIp ||
+      cfIp ||
       request.ip ||
-      null;
+      '127.0.0.1';
 
     const userAgent = headersList.get('user-agent') || 'unknown';
     const refererHeader = headersList.get('referer');
 
-    // Determine external referrer
     let referrerDomain = null;
     const websiteUrl = process.env.YOUR_WEBSITE_URL
       ? new URL(process.env.YOUR_WEBSITE_URL).hostname.replace(/^www\./, '')
@@ -37,11 +39,11 @@ export async function POST(request) {
         const host = url.hostname.replace(/^www\./, '');
         if (!websiteUrl || !host.includes(websiteUrl)) referrerDomain = host;
       } catch {
-        // ignore invalid referer
+        /* ignore invalid referrer */
       }
     }
 
-    // Parse UTM
+    // ✅ Parse UTM source
     let utmSource = null;
     if (clientSearch) {
       const params = new URLSearchParams(clientSearch);
@@ -50,34 +52,28 @@ export async function POST(request) {
 
     // ✅ Geo lookup
     let locationData = { location: 'Unknown Location', coordinates: null };
-
-    if (ip && !ip.startsWith('127.') && !ip.startsWith('192.168') && !ip.startsWith('::1')) {
+    if (!ip.startsWith('127.') && !ip.startsWith('192.168') && !ip.startsWith('::1')) {
       try {
-        // Use a more reliable geo API (ipapi.co sometimes fails)
-        const geoResponse = await fetch(`https://ipwho.is/${ip}`);
-        const data = await geoResponse.json();
+        const geoRes = await fetch(`https://ipwho.is/${ip}`);
+        const data = await geoRes.json();
 
         if (data.success && data.country) {
-          const locationString = data.city
-            ? `${data.city}, ${data.country}`
-            : data.country;
-
           locationData = {
-            location: locationString,
+            location: data.city ? `${data.city}, ${data.country}` : data.country,
             coordinates: [data.longitude, data.latitude],
           };
         }
-      } catch (geoError) {
-        console.warn(`Geo lookup failed for ${ip}:`, geoError.message);
+      } catch (err) {
+        console.warn('Geo lookup failed:', err.message);
       }
     }
 
-    // ✅ Save asynchronously
+    // ✅ Async DB write (non-blocking)
     dbConnect()
       .then(() =>
         Visit.create({
           path,
-          ip: ip || 'unknown',
+          ip,
           userAgent,
           referrer: referrerDomain,
           source: utmSource,

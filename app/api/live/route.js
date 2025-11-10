@@ -1,46 +1,33 @@
 // app/api/live/route.js
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { Server } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
-import { createClient } from "ioredis";
 
-let io; // Singleton socket server
+// --- Global singleton ---
+let io = globalThis._io;
 
-export async function GET(request) {
-  if (!io) {
-    const httpServer = request.socket?.server || request.raw?.server;
+export async function GET() {
+  try {
+    // Initialize only once
+    if (!io) {
+      console.log("🔌 Starting Socket.IO server (no Redis)...");
 
-    if (!httpServer.io) {
-      const ioInstance = new Server(httpServer, {
-        path: "/api/live/socket",
-        cors: { origin: "*" },
+      io = new Server({
+        cors: { origin: "*", methods: ["GET", "POST"] },
         transports: ["websocket"],
+        path: "/api/live/socket",
       });
 
-      // ✅ --- Redis Adapter (Add this block here) ---
-      try {
-        const pubClient = createClient({ url: process.env.REDIS_URL });
-        const subClient = pubClient.duplicate();
+      globalThis._io = io;
+      console.log("✅ Socket.IO initialized (single-instance mode).");
 
-        await pubClient.connect();
-        await subClient.connect();
-
-        ioInstance.adapter(createAdapter(pubClient, subClient));
-        console.log("✅ Redis adapter connected for Socket.IO clustering.");
-      } catch (err) {
-        console.error("❌ Redis connection failed:", err);
-      }
-      // ✅ --- End of Redis adapter setup ---
-
-      httpServer.io = ioInstance;
-      io = ioInstance;
-
-      console.log("✅ Socket.IO live server started.");
-
-      // In-memory active users
+      // In-memory live visitor map
       const activeUsers = new Map();
 
       io.on("connection", (socket) => {
+        console.log(`[Socket] Connected: ${socket.id}`);
+
         socket.on("join", (userData) => {
           if (!userData?.ip) return;
           activeUsers.set(socket.id, userData);
@@ -50,10 +37,17 @@ export async function GET(request) {
         socket.on("disconnect", () => {
           activeUsers.delete(socket.id);
           io.emit("visitors", Array.from(activeUsers.values()));
+          console.log(`[Socket] Disconnected: ${socket.id}`);
         });
       });
     }
-  }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Socket.IO live server running (no Redis).",
+    });
+  } catch (err) {
+    console.error("❌ Live Socket.IO Error:", err.message);
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
 }

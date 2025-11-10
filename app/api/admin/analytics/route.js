@@ -1,13 +1,19 @@
-import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import Visit from '../../../models/visit';
+// app/api/admin/analytics/route.js
+import { NextResponse } from "next/server";
+import dbConnect from "../../../lib/dbConnect";
+import Visit from "../../../models/visit";
 
 export async function GET() {
-  await dbConnect();
   try {
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    // ✅ Ensure MongoDB connection before queries
+    await dbConnect();
 
+    // Pre-calc time ranges
+    const now = Date.now();
+    const fiveMinutesAgo = new Date(now - 60 * 1000);
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+    // ✅ Run all queries in parallel for efficiency
     const [
       liveVisitorsDocs,
       topPages,
@@ -16,74 +22,91 @@ export async function GET() {
       dailyTraffic,
       totalViews,
       totalUniquesDocs,
-      latestVisits // CHANGED: This is the query we are updating
+      latestVisits,
     ] = await Promise.all([
-      // 1. "Live" Visitors (Unique raw IPs in last 5 mins)
-      Visit.distinct('ip', { timestamp: { $gt: fiveMinutesAgo } }).exec(),
+      // 1️⃣ Live visitors (unique IPs in last 20 seconds)
+      Visit.distinct("ip", { timestamp: { $gt: fiveMinutesAgo } }),
 
-      // 2. Top Pages (last 30 days)
+      // 2️⃣ Top pages (30 days)
       Visit.aggregate([
         { $match: { timestamp: { $gt: thirtyDaysAgo } } },
-        { $group: { _id: '$path', count: { $sum: 1 } } },
+        { $group: { _id: "$path", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
-        { $limit: 10 }
-      ]).exec(),
+        { $limit: 10 },
+      ]),
 
-      // 3. Top Referrers (Domains)
+      // 3️⃣ Top referrers
       Visit.aggregate([
-        { $match: { timestamp: { $gt: thirtyDaysAgo }, referrer: { $ne: null } } },
-        { $group: { _id: '$referrer', count: { $sum: 1 } } },
+        {
+          $match: {
+            timestamp: { $gt: thirtyDaysAgo },
+            referrer: { $ne: null },
+          },
+        },
+        { $group: { _id: "$referrer", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
-        { $limit: 10 }
-      ]).exec(),
+        { $limit: 10 },
+      ]),
 
-      // 4. Top Sources (UTM parameters)
+      // 4️⃣ Top sources (UTM)
       Visit.aggregate([
-        { $match: { timestamp: { $gt: thirtyDaysAgo }, source: { $ne: null } } },
-        { $group: { _id: '$source', count: { $sum: 1 } } },
+        {
+          $match: {
+            timestamp: { $gt: thirtyDaysAgo },
+            source: { $ne: null },
+          },
+        },
+        { $group: { _id: "$source", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
-        { $limit: 10 }
-      ]).exec(),
-      
-      // 5. Daily Traffic Graph
+        { $limit: 10 },
+      ]),
+
+      // 5️⃣ Daily traffic (graph)
       Visit.aggregate([
         { $match: { timestamp: { $gt: thirtyDaysAgo } } },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp", timezone: "Asia/Dhaka" } },
-            count: { $sum: 1 }
-          }
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$timestamp",
+                timezone: "Asia/Dhaka",
+              },
+            },
+            count: { $sum: 1 },
+          },
         },
-        { $sort: { _id: 1 } }
-      ]).exec(),
+        { $sort: { _id: 1 } },
+      ]),
 
-      // 6. All-Time Page Views
-      Visit.countDocuments().exec(),
-      
-      // 7. All-Time Unique Visitors (by raw IP)
-      Visit.distinct('ip').exec(),
-      
-      // --- QUERY 8: UPDATED ---
-      // Get the 50 most recent visits for the scrollable log
-      Visit.find({})
+      // 6️⃣ All-time page views
+      Visit.countDocuments(),
+
+      // 7️⃣ All-time unique visitors
+      Visit.distinct("ip"),
+
+      // 8️⃣ Latest visits (scrollable log)
+      Visit.find({
+        coordinates: { $ne: null },
+      })
         .sort({ timestamp: -1 })
-        .limit(50) // CHANGED: Increased from 10 to 50 for the scrollable list
-        .select('ip path timestamp location coordinates') // CHANGED: Added location and coordinates
-        .lean()
-        .exec()
-      // --- END UPDATE ---
+        .limit(50)
+        .select("_id ip path timestamp location coordinates")
+        .lean(),
     ]);
-    
+
+    // ✅ Prepare response data
     const liveVisitorsCount = liveVisitorsDocs.length;
     const totalUniques = totalUniquesDocs.length;
 
-    const formattedDailyTraffic = dailyTraffic.map(item => ({
+    const formattedDailyTraffic = dailyTraffic.map((item) => ({
       name: item._id,
-      visits: item.count
+      visits: item.count,
     }));
 
-    return NextResponse.json({ 
-      success: true, 
+    // ✅ Return all analytics data
+    return NextResponse.json({
+      success: true,
       data: {
         liveVisitors: liveVisitorsCount,
         topPages,
@@ -92,12 +115,14 @@ export async function GET() {
         dailyTraffic: formattedDailyTraffic,
         allTimeViews: totalViews,
         allTimeUniques: totalUniques,
-        latestVisits: latestVisits // This will now contain location and coordinates
-      } 
+        latestVisits,
+      },
     });
-
   } catch (error) {
-    console.error("API_ANALYTICS_GET_ERROR:", error);
-    return NextResponse.json({ success: false, error: 'Failed to fetch analytics.' }, { status: 500 });
+    console.error("API_ANALYTICS_GET_ERROR:", error.message);
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to fetch analytics." },
+      { status: 500 }
+    );
   }
 }
