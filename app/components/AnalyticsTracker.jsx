@@ -12,7 +12,16 @@ export function AnalyticsTracker() {
       return;
     }
 
-    // Fire-and-forget the tracking request
+    // 1. Generate unique Event ID for Deduplication
+    const eventId = crypto.randomUUID(); 
+
+    // 2. Track Client-Side (Browser Pixel)
+    if (typeof window !== "undefined" && window.fbq) {
+      // We pass eventID so Facebook can match it with the server event
+      window.fbq('track', 'PageView', {}, { eventID: eventId });
+    }
+
+    // 3. Track Server-Side (Your API + CAPI)
     fetch('/api/track', {
       method: 'POST',
       headers: {
@@ -21,7 +30,8 @@ export function AnalyticsTracker() {
       body: JSON.stringify({ 
         path: pathname,
         referrer: document.referrer, // Send the full referrer URL
-        search: window.location.search, // Send the query string (e.g., ?utm_source=facebook)
+        search: window.location.search, // Send the query string
+        eventId: eventId, // Pass the unique ID to the server
       }),
     }).catch(err => {
       console.error("Failed to track page view:", err);

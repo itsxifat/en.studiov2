@@ -1,7 +1,8 @@
-import React, { Suspense } from "react"; // ✨ 1. Import Suspense
+import React, { Suspense } from "react"; 
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
 import { AnalyticsTracker } from "./components/AnalyticsTracker"; 
+import FacebookPixel from "./components/FacebookPixel"; //
 
 // Setup the font
 const baiJamjuree = Bai_Jamjuree({
@@ -10,7 +11,7 @@ const baiJamjuree = Bai_Jamjuree({
   variable: "--font-bai-jamjuree",
 });
 
-// --- SEO Metadata (Same as before) ---
+// --- SEO Metadata ---
 export const metadata = {
   title: {
     default: "Enfinito Studio - Professional Video & Photo Production",
@@ -54,16 +55,19 @@ export const metadata = {
     images: ["https://res.cloudinary.com/dagmsvwui/image/upload/v1762236962/Post_01_1_ze4atm.png"],
   },
 };
-// --- End of Metadata ---
-
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${baiJamjuree.variable} no-scrollbar`}>
       <body className={`font-sans antialiased bg-black text-white`}>
+        {/* Load Facebook Pixel */}
+        <Suspense fallback={null}>
+           <FacebookPixel />
+        </Suspense>
+        
         {children}
-        {/* ✨ 2. Wrap AnalyticsTracker in Suspense */}
-        {/* This tells Next.js to load this component dynamically */}
+        
+        {/* Track Views (Client + Server CAPI) */}
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>
