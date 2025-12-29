@@ -1,16 +1,45 @@
-// This regex is a robust version to find a YouTube ID from various URL formats
-const YOUTUBE_ID_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-
 /**
- * Extracts a YouTube Video ID from a URL.
- * @param {string} url The YouTube URL
- * @returns {string | null} The 11-character Video ID or null if not found.
+ * Extract YouTube Video ID from ANY valid YouTube URL
+ * Supports:
+ * - youtube.com/watch?v=
+ * - youtu.be/
+ * - youtube.com/shorts/
+ * - youtube.com/embed/
+ * - m.youtube.com
  */
 export function extractYoutubeId(url) {
   if (!url || typeof url !== 'string') return null;
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return null;
 
-  const match = trimmedUrl.match(YOUTUBE_ID_REGEX);
-  return match ? match[1] : null;
+  try {
+    const parsedUrl = new URL(url.trim());
+
+    // youtu.be/VIDEO_ID
+    if (parsedUrl.hostname === 'youtu.be') {
+      return parsedUrl.pathname.split('/')[1] || null;
+    }
+
+    // youtube.com / m.youtube.com
+    if (
+      parsedUrl.hostname.includes('youtube.com') ||
+      parsedUrl.hostname.includes('m.youtube.com')
+    ) {
+      // youtube.com/watch?v=VIDEO_ID
+      const vParam = parsedUrl.searchParams.get('v');
+      if (vParam) return vParam;
+
+      // youtube.com/shorts/VIDEO_ID
+      if (parsedUrl.pathname.startsWith('/shorts/')) {
+        return parsedUrl.pathname.split('/')[2] || null;
+      }
+
+      // youtube.com/embed/VIDEO_ID
+      if (parsedUrl.pathname.startsWith('/embed/')) {
+        return parsedUrl.pathname.split('/')[2] || null;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
 }
