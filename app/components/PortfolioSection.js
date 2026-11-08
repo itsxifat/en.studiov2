@@ -5,12 +5,14 @@ import { ArrowRight, Loader2, AlertTriangle, Play, Camera } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const PortfolioSection = () => {
-  const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const PortfolioSection = ({ initialItems = [] }) => {
+  const [items, setItems] = useState(initialItems);
+  const [isLoading, setIsLoading] = useState(initialItems.length === 0);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Server already supplied the featured list → no post-hydration round-trip.
+    if (initialItems.length > 0) return;
     const fetchFeaturedWork = async () => {
       setIsLoading(true);
       setError(null);
@@ -29,7 +31,7 @@ const PortfolioSection = () => {
       }
     };
     fetchFeaturedWork();
-  }, []);
+  }, [initialItems.length]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -119,7 +121,7 @@ const PortfolioSection = () => {
         </div>
         {renderContent()}
         <div className="text-center mt-16">
-          <Link href="/portfolio" className="brutalist-button-secondary inline-flex items-center gap-2" data-magnetic>
+          <Link href="/portfolio" className="brutalist-button-secondary inline-flex items-center gap-2">
             View Full Portfolio <ArrowRight size={20} />
           </Link>
         </div>

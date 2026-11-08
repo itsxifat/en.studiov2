@@ -3,13 +3,36 @@
 :root {
   --background: #000000;
   --foreground: #ededed;
-  --font-bai-jamjuree: "Bai Jamjuree", sans-serif;
+
+  /* Ink — off-white so display type does not glare on black */
+  --ink: #ededed;
+  --ink-2: rgba(255, 255, 255, 0.62);
+  --ink-3: rgba(255, 255, 255, 0.5);
+
+  /* Rules and wells */
+  --rule: rgba(255, 255, 255, 0.1);
+  --rule-soft: rgba(255, 255, 255, 0.06);
+  --well: rgba(255, 255, 255, 0.04);
+
+  /* The single brand accent */
+  --accent: #53a4db;
+
+  /* Controls */
+  --pill-bg: #ffffff;
+  --pill-bg-hover: #e8e8e8;
+  --pill-fg: #000000;
+  --focus: rgba(255, 255, 255, 0.6);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: #53a4db;
   --font-sans: var(--font-bai-jamjuree);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -18,15 +41,50 @@ body {
   font-family: var(--font-bai-jamjuree), sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-bai-jamjuree), sans-serif;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* One focus style for every interactive element. Never pair with outline-none. */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 /* Hide scrollbar but keep scroll */
 .no-scrollbar {
-  -ms-overflow-style: none;      /* IE/Edge */
-  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
 }
-.no-scrollbar::-webkit-scrollbar { /* Chrome/Safari/Opera */
+.no-scrollbar::-webkit-scrollbar {
+  /* Chrome/Safari/Opera */
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --rule: rgba(255, 255, 255, 0.4);
+    --rule-soft: rgba(255, 255, 255, 0.25);
+    --ink-3: rgba(255, 255, 255, 0.7);
+  }
 }

@@ -5,6 +5,7 @@ import Photo from '../../../../models/photo';
 import BtsItem from '../../../../models/btsItem'; // ✨ 1. Import BtsItem
 import { v2 as cloudinary } from 'cloudinary';
 import mongoose from 'mongoose';
+import { revalidateFeatured } from '../../../../lib/revalidateFeatured';
 
 cloudinary.config({ /* ... credentials ... */ });
 
@@ -24,6 +25,7 @@ export async function PUT(request, { params }) {
     if (!updatedProject) {
       return NextResponse.json({ success: false, error: 'Project not found.' }, { status: 404 });
     }
+    revalidateFeatured();
     return NextResponse.json({ success: true, data: updatedProject });
 
   } catch (error) {
@@ -69,6 +71,7 @@ export async function DELETE(request, { params }) {
     // 4. Delete the project itself
     await PhotoProject.deleteOne({ _id: id });
 
+    revalidateFeatured();
     return NextResponse.json({ success: true, data: {} });
   } catch (error) {
     console.error('API_ADMIN_PHOTO_PROJECTS_DELETE_ERROR:', error);

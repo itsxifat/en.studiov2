@@ -1,10 +1,11 @@
 import React, { Suspense } from "react"; 
 import { Bai_Jamjuree } from "next/font/google";
 import "./globals.css";
-import { AnalyticsTracker } from "./components/AnalyticsTracker"; 
+import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import FacebookPixel from "./components/FacebookPixel"; //
 
-// Setup the font
+// Body font (self-hosted and preloaded by next/font). The hero's display serif is
+// declared in app/components/hero/HeroSection.js so it only ships on routes that use it.
 const baiJamjuree = Bai_Jamjuree({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
@@ -31,11 +32,11 @@ export const metadata = {
     "Commercial Shoots Bangladesh", "Enfinito",
   ],
   robots: { index: true, follow: true },
-  metadataBase: new URL("https://en-studio.enfinito.com"), 
+  metadataBase: new URL("https://studio.enfinito.com"),
   openGraph: {
     title: "Enfinito Studio - Professional Video & Photo Production",
     description: "Specializing in high-end videography, photography, TVCs, and OVCs.",
-    url: "https://en-studio.enfinito.com",
+    url: "https://studio.enfinito.com",
     siteName: "Enfinito Studio",
     images: [
       {
@@ -58,7 +59,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${baiJamjuree.variable} no-scrollbar`}>
+    <html
+      lang="en"
+      className={`${baiJamjuree.variable} no-scrollbar`}
+      data-scroll-behavior="smooth"
+    >
       <body className={`font-sans antialiased bg-black text-white`}>
         {/* Load Facebook Pixel */}
         <Suspense fallback={null}>

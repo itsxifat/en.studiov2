@@ -1,18 +1,33 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
+import {
+  Layers, Film, Camera, Video, Clapperboard, Aperture, Image as ImageIcon, Palette, PenTool,
+  Monitor, PcCase, Scale3d, VectorSquare, LineSquiggle, Megaphone, Sparkles, Box, Globe,
+  Smartphone, Mic, Music, Brush, Projector, Wand2,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Loader2, ArrowRight } from 'lucide-react';
 
 // --- Icon Map ---
+// Explicit allow-list (a namespace import + spread shipped the whole lucide set, ~1,500
+// icons, in the home bundle). Unknown names fall back to Layers.
 const IconMap = {
-  ...LucideIcons,
-  default: LucideIcons.Layers, // Default icon
+  Layers, Film, Camera, Video, Clapperboard, Aperture, Image: ImageIcon, Palette, PenTool,
+  Monitor, PcCase, Pc: PcCase, Scale3d, VectorSquare, LineSquiggle, Megaphone, Sparkles, Box,
+  Globe, Smartphone, Mic, Music, Brush, Projector, Wand2,
 };
+// Accepts "Film", "film", "scale-3d", "vector_square"… → PascalCase lookup.
+const toPascal = (name) =>
+  String(name ?? '')
+    .trim()
+    .split(/[-_s]+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join('');
 const getIcon = (name) => {
-  const Icon = IconMap[name];
-  return Icon ? <Icon className="h-8 w-8 text-[#53A4DB]" /> : <IconMap.default className="h-8 w-8 text-[#53A4DB]" />;
+  const Icon = Object.prototype.hasOwnProperty.call(IconMap, toPascal(name)) ? IconMap[toPascal(name)] : Layers;
+  return <Icon className="h-8 w-8 text-[#53A4DB]" />;
 };
 
 // --- Service Card Component ---

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 const CATEGORY_API = '/api/admin/category';
-const PORTFOLIO_API = '/api/portfolio';
+const PORTFOLIO_API = '/api/admin/portfolio'; // middleware-protected; the public route is read-only
 
 export default function AdminPortfolioPage() {
     const [status, setStatus] = useState(null);

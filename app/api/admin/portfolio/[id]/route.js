@@ -3,6 +3,7 @@ import dbConnect from '../../../../lib/dbConnect';
 import PortfolioItem from '../../../../models/portfolioItem';
 import { extractYoutubeId } from '../../../../lib/youtubeHelper';
 import mongoose from 'mongoose';
+import { revalidateFeatured } from '../../../../lib/revalidateFeatured';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -87,6 +88,7 @@ export async function PUT(request, { params }) {
     if (!updatedItem) {
       return NextResponse.json({ success: false, error: 'Item not found.' }, { status: 404 });
     }
+    revalidateFeatured();
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (error) {
      console.error(`API_ADMIN_PORTFOLIO_PUT_${id}_ERROR:`, error);
@@ -112,6 +114,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ success: false, error: 'Item not found.' }, { status: 404 });
     }
     
+    revalidateFeatured();
     return NextResponse.json({ success: true, data: {} });
   } catch (error) {
     console.error(`API_ADMIN_PORTFOLIO_DELETE_${id}_ERROR:`, error);

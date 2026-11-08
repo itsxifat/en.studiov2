@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../lib/dbConnect';
 import PortfolioItem from '../../models/portfolioItem';
 import PhotoProject from '../../models/photoProject'; // ✨ Import PhotoProject
+import { FEATURED_LIMIT } from '../../lib/media';
 
 // Configure Cloudinary
 import { v2 as cloudinary } from 'cloudinary';
@@ -18,12 +19,14 @@ export async function GET() {
     // 1. Fetch Featured Videos
     const featuredVideos = await PortfolioItem.find({ isFeatured: true })
       .sort({ createdAt: -1 })
+      .limit(FEATURED_LIMIT)
       .select('title category thumbnail youtubeId _id createdAt')
       .lean();
 
     // ✨ 2. Fetch Featured Photo Projects
     const featuredPhotoProjects = await PhotoProject.find({ isFeatured: true })
       .sort({ createdAt: -1 })
+      .limit(FEATURED_LIMIT)
       .select('title slug thumbnail createdAt') // Select the slug
       .lean();
 

@@ -3,6 +3,7 @@ import dbConnect from '../../../../lib/dbConnect';
 import PortfolioItem from '../../../../models/portfolioItem';
 import PhotoProject from '../../../../models/photoProject'; // ✨ 1. Import the PhotoProject model
 import mongoose from 'mongoose';
+import { revalidateFeatured } from '../../../../lib/revalidateFeatured';
 
 // Cloudinary is no longer needed in this file
 // const { v2 as cloudinary } = require('cloudinary');
@@ -30,6 +31,7 @@ export async function POST(request) {
       if (!updatedItem) {
         return NextResponse.json({ success: false, error: 'Video not found.' }, { status: 404 });
       }
+      revalidateFeatured();
       // Return data in a consistent format
       return NextResponse.json({ success: true, data: { ...updatedItem, type: 'video' } });
 
@@ -47,6 +49,7 @@ export async function POST(request) {
       if (!updatedItem) {
         return NextResponse.json({ success: false, error: 'Photo Project not found.' }, { status: 404 });
       }
+      revalidateFeatured();
       // Return data in a consistent format
       return NextResponse.json({ success: true, data: { ...updatedItem, type: 'photoProject' } });
 

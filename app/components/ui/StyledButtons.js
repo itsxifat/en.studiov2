@@ -1,53 +1,28 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { ArrowRight, Send } from 'lucide-react'; // Clean icons
+import Arrow from "../hero/Arrow";
+import b from "./buttons.module.css";
 
 /**
- * ButtonPrimary
- * A professional, high-contrast solid button.
- * Accessible focus state without an outline on click.
+ * ButtonPill — the one solid call to action. White pill, black label,
+ * background-only hover, 2% press. No icon.
  */
-export const ButtonPrimary = ({ label, href }) => {
+export function ButtonPill({ href, children, className = "", style }) {
   return (
-    <Link
-      href={href}
-      className="inline-flex items-center justify-center gap-2 px-6 py-3 h-12
-                 bg-white text-black font-semibold rounded-lg
-                 transition-colors duration-300 ease-out
-                 hover:bg-neutral-200
-                 active:scale-95
-                 focus:outline-none focus-visible:ring-2 focus-visible:ring-white 
-                 focus-visible:ring-offset-2 focus-visible:ring-offset-black" // Professional focus
-      aria-label={label}
-    >
-      <span className="relative z-10">{label}</span>
-      <ArrowRight size={18} />
+    <Link href={href} style={style} className={`${b.pill} focus-ring ${className}`}>
+      {children}
     </Link>
   );
-};
+}
 
 /**
- * ButtonSecondary
- * A professional, minimalist button with no border.
- * Accessible focus state without an outline on click.
+ * TextLink — secondary action. Underline draws from the left on hover and
+ * retracts to the right on leave (transform on ::after, compositor-only).
  */
-export const ButtonSecondary = ({ label, href }) => {
+export function TextLink({ href, children, className = "", style }) {
   return (
-    <Link
-      href={href}
-      className="inline-flex items-center justify-center gap-2 px-6 py-3 h-12
-                 bg-neutral-800/50 text-neutral-200 font-semibold rounded-lg
-                 transition-all duration-300 ease-out
-                 hover:bg-neutral-700/80 hover:text-white
-                 active:scale-95
-                 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-600 
-                 focus-visible:ring-offset-2 focus-visible:ring-offset-black" // Professional focus
-      aria-label={label}
-    >
-      <span className="relative z-10">{label}</span>
-      <Send size={16} />
+    <Link href={href} style={style} className={`${b.textLink} focus-ring ${className}`}>
+      <span className={b.label}>{children}</span>
+      <Arrow dir="right" />
     </Link>
   );
-};
+}
